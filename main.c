@@ -46,6 +46,7 @@
 
 int16_t width = 0;
 int16_t height = 0;
+int16_t *ledmap = NULL;
 
 ws2811_t ledstring = {
 
@@ -66,8 +67,6 @@ ws2811_t ledstring = {
         },
     },
 };
-
-int16_t *ledmap = NULL;
 
 // 5x5 font
 static const uint8_t font5x5[] = {
@@ -1195,31 +1194,28 @@ void ShowFrame() {
 
 int main(int argc, char *argv[]) {
 
-	pid_t mypid;
-	uint16_t i;
-
-	setup_handlers();
 	srand(time(NULL));
+	setup_handlers();
 
+	// Read LED mapping from map.txt file
 	ReadMap();
 
 	if (argc == 2) {
-
-		// LIGHTS OFF
-		if (strcmp(argv[1], "off") == 0)
-			SetAllLights(BLACK);
 
 		// LIGHTS ON
 		if (strcmp(argv[1], "on") == 0)
 			StartService(TimeDateWeather);
 
+		// LIGHTS OFF
+		if (strcmp(argv[1], "off") == 0)
+			SetAllLights(BLACK);
+
 		// LIGHTS STATUS
 		if (strcmp(argv[1], "status") == 0) {
-			FILE *fp = fopen(PIDFILE, "r");
-			if (fp == NULL)
-				printf("Lights are off.\n");
-			else
+			if (FileExists(PIDFILE))
 				printf("Lights are on.\n");
+			else
+				printf("Lights are off.\n");
 			exit(0);
 		}
 
@@ -1234,6 +1230,14 @@ int main(int argc, char *argv[]) {
 		// LIGHTS BLUE
 		if (strcmp(argv[1], "blue") == 0)
 			SetAllLights(BLUE);
+
+		// LIGHTS MAGENTA
+		if (strcmp(argv[1], "magenta") == 0)
+			SetAllLights(MAGENTA);
+
+		// LIGHTS CYAN
+		if (strcmp(argv[1], "cyan") == 0)
+			SetAllLights(CYAN);
 
 		// LIGHTS RAINBOW
 		if (strcmp(argv[1], "rainbow") == 0)
