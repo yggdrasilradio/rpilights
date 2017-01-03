@@ -1,0 +1,29 @@
+o--o  o--o  o--o  o--o  o--o  .  .  .  o--o  o--o  o--o  o--o  o--o  .  .  .  o--o  o--o  o--o  o--o  o--o  .  .  .  o--o  o--o  o--o  o--o  o--o
+|  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |
+o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o
+|  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |
+o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o
+|  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |
+o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o
+|  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |
+o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o
+|  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |
+o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o
+|  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |
+o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o
+|  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |
+o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o
+|  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |
+o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o
+|  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |
+0  o--o  o--o  o--o  o--o  o-----------o  o--o  o--o  o--o  o--o  o-----------o  o--o  o--o  o--o  o--o  o-----------o  o--o  o--o  o--o  o--o  o
+
+o--o  o--o  o--o  o--o  o--o  .  .  .  o--o  o--o  o--o  o--o  o--o  .  .  .  o--o  o--o  o--o  o--o  o--o  .  .  .  o--o  o--o  o--o  o--o  o--o
+|  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |
+o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o
+|  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |
+o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o
+|  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |
+o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o  .  .  .  o  o  o  o  o  o  o  o  o  o
+|  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |           |  |  |  |  |  |  |  |  |  |
+1  o--o  o--o  o--o  o--o  o-----------o  o--o  o--o  o--o  o--o  o-----------o  o--o  o--o  o--o  o--o  o-----------o  o--o  o--o  o--o  o--o  o

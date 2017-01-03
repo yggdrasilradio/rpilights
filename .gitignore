@@ -1,0 +1,5 @@
+.old
+.forecast
+.temperature
+.holidays
+*.o
