@@ -950,26 +950,32 @@ void ReadMap() {
 			fprintf(stderr,"Out of memory.\n");
 			exit(1);
 		}
+
+		// Quit on EOF
 		if (fgets(words[i], max_line_len - 1, fp) == NULL)
 			break;
 
+		// Strip line terminators
 		for (j = strlen(words[i]) - 1; j >= 0 && (words[i][j] == '\n' || words[i][j] == '\r'); j--);
 		words[i][j + 1] = '\0';
 
-		if (j > maxlength)
-			maxlength = j;
 
+		// Get LED display width, height, max line size
 		k = CharCount(words[i], 'o') + CharCount(words[i], '.');
 		if (k > width)
 			width = k;
 		if (k > 0)
 			height++;
+		if (j > maxlength)
+			maxlength = j;
 
+		// Beginning of channel 0?
 		if (CharCount(words[i], '0') > 0) {
 			xchannel0 = (uint8_t*) strchr(words[i], '0') - &words[i][0];
 			ychannel0 = i;
 		}
 
+		// Beginning of channel 1?
 		if (CharCount(words[i], '1') > 0) {
 			xchannel1 = (uint8_t*) strchr(words[i], '1') - &words[i][0];
 			ychannel1 = i;
@@ -979,7 +985,6 @@ void ReadMap() {
 
 	maxlength++;
 	
-	//printf("width %d height %d\n", width, height);
 	for (j = 0; j < i; j++)
 		while (strlen(words[j]) <= maxlength)
 			strcat(words[j], " ");
@@ -1183,6 +1188,7 @@ void SetAllLights(uint32_t color) {
 }
 
 void ShowFrame() {
+
 	RootCheck();
 	StopService();
 	ws2811_init(&ledstring);
@@ -1251,5 +1257,8 @@ int main(int argc, char *argv[]) {
 	printf("\trpilights red\tSet all lights to red\n");
 	printf("\trpilights blue\tSet all lights to blue\n");
 	printf("\trpilights green\tSet all lights to green\n");
+	printf("\trpilights magenta\tSet all lights to magenta\n");
+	printf("\trpilights cyan\tSet all lights to cyan\n");
+	printf("\trpilights rainbow\tDisplay rainbow pattern\n");
 	exit(0);
 }
