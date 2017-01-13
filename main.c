@@ -458,7 +458,7 @@ void ScrollString(uint8_t *s, uint32_t color, const uint8_t **picture, uint32_t 
 	}
 }
 
-uint8_t Do5x8String(uint8_t *s, uint32_t color, uint32_t *i) {
+uint8_t Do5x8String(uint8_t *s, uint32_t color, uint32_t *i, int32_t y) {
 
 	uint32_t j;
 	uint32_t bcolor;
@@ -468,7 +468,7 @@ uint8_t Do5x8String(uint8_t *s, uint32_t color, uint32_t *i) {
 	if (n <= 0)
 		return(TRUE);
 
-	Draw5x8String(s, width - *i, 1, color);
+	Draw5x8String(s, width - *i, y, color);
 	itime++;
 	(*i)++;
 	if (*i < (width + (n * 6) + 5))
@@ -477,7 +477,7 @@ uint8_t Do5x8String(uint8_t *s, uint32_t color, uint32_t *i) {
 		return(TRUE);
 }
 
-uint8_t Do5x5String(uint8_t *s, uint32_t color, uint32_t *i) {
+uint8_t Do5x5String(uint8_t *s, uint32_t color, uint32_t *i, int32_t y) {
 
 	uint32_t j;
 	uint32_t bcolor;
@@ -487,7 +487,7 @@ uint8_t Do5x5String(uint8_t *s, uint32_t color, uint32_t *i) {
 	if (n <= 0)
 		return(TRUE);
 
-	Draw5x5String(s, width - *i, 9, color);
+	Draw5x5String(s, width - *i, y, color);
 	itime++;
 	(*i)++;
 	if (*i < (width + (n * 6) + 5))
@@ -499,7 +499,7 @@ uint8_t Do5x5String(uint8_t *s, uint32_t color, uint32_t *i) {
 void TimeDateWeather () {
 
 	uint32_t i0 = 0, i1 = 0, count;
-	int32_t idur, i, j;
+	int32_t idur, i, j, y5x8, y5x5;
 	FILE *fp;
 	uint8_t s0[2046], s1[2046], s2[2046];
 	uint8_t sTemperature[2046], sForecast[2046];
@@ -529,6 +529,9 @@ void TimeDateWeather () {
 		arr[i].color = 0;
 	}
 
+	y5x8 = floor((height - 13) / 2);
+	y5x5 = y5x8 + 8;
+
 	ws2811_init(&ledstring);
 
 	while(TRUE) {
@@ -541,11 +544,11 @@ void TimeDateWeather () {
 			// Render strings
 			for (i = 0; i < (sizeof(arr) / sizeof(arr[0])); i++) {
 				if (arr[i].fonttype == 1) 
-					if (Do5x8String(arr[i].s, arr[i].color, &arr[i].pos))
+					if (Do5x8String(arr[i].s, arr[i].color, &arr[i].pos, y5x8))
 						arr[i].fonttype = 0;
 
 				if (arr[i].fonttype == 2) 
-					if (Do5x5String(arr[i].s, arr[i].color, &arr[i].pos))
+					if (Do5x5String(arr[i].s, arr[i].color, &arr[i].pos, y5x5))
 						arr[i].fonttype = 0;
 			}
 
@@ -1212,6 +1215,10 @@ int main(int argc, char *argv[]) {
 		if (strcmp(argv[1], "on") == 0)
 			StartService(TimeDateWeather);
 
+		// LIGHTS TIMEDATEWEATHER
+		if (strcmp(argv[1], "timedateweather") == 0)
+			StartService(TimeDateWeather);
+
 		// LIGHTS OFF
 		if (strcmp(argv[1], "off") == 0)
 			SetAllLights(BLACK);
@@ -1253,6 +1260,7 @@ int main(int argc, char *argv[]) {
 	// USAGE
 	printf("Usage:");
 	printf("\trpilights on\tTurn lights on\n");
+	printf("\trpilights timedateweather\tDisplay scrolling time, date, weather\n");
 	printf("\trpilights off\tTurn lights off\n");
 	printf("\trpilights red\tSet all lights to red\n");
 	printf("\trpilights blue\tSet all lights to blue\n");
