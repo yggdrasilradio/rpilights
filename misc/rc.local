@@ -1,0 +1,5 @@
+# Weather data update
+/home/pi/rpilights/scripts/updatewx &
+
+# Permissions fix for lights
+chmod 666 /dev/mem
