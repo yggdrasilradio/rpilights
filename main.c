@@ -6,6 +6,11 @@
 #include <signal.h>
 #include <time.h>
 #include <math.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <netinet/in.h>
+#include <net/if.h>
 
 #include "rpi_ws281x/ws2811.h"
 
@@ -429,14 +434,11 @@ uint32_t Colors(uint32_t angle) {
 
 static uint32_t itime = 0;
 
-void ScrollString(uint8_t *s, uint32_t color, const uint8_t **picture, uint32_t xdelta, uint32_t ydelta) {
+void ScrollString(uint8_t *s, uint32_t color) {
 
-	uint32_t i, j, k;
-	uint32_t bcolor;
-	uint32_t x, y;
+	uint32_t i, j, k, bcolor, y;
 
-	x = 0;
-	y = 0;
+	y = floor((height - 10) / 2);
 	uint32_t n = strlen(s) - 1;
 	k = width;
 	for (i = 0; i < width + (n * 6) + 5; i++) {
@@ -446,11 +448,11 @@ void ScrollString(uint8_t *s, uint32_t color, const uint8_t **picture, uint32_t 
 		// Scrolling color borders
 		for (j = 0; j < k; j++) {
 			bcolor = Colors((j % k) * (1536 / k));
-			setPixel((j + itime) % width, 3, bcolor);
-			setPixel((j + itime) % width, 12, bcolor);
+			setPixel((j + itime) % width, y, bcolor);
+			setPixel((j + itime) % width, y + 9, bcolor);
 		}
 
-		Draw5x8String(s, width - i, 4, color);
+		Draw5x8String(s, width - i, y + 1, color);
 		itime++;
 
 		ws2811_render(&ledstring);
@@ -663,7 +665,7 @@ void TimeDateWeather () {
 							break;
 						s[strlen(s) - 1] = '\0';
 						DrawShapes(70);
-						ScrollString(s, RGB(255, 255, 255), NULL, 0, 0);
+						ScrollString(s, RGB(255, 255, 255));
 						DrawShapes(70);
 						break;
 					}
@@ -1201,6 +1203,24 @@ void ShowFrame() {
 	exit(0);
 }
 
+void ShowIP() {
+
+	uint8_t s[500];
+	int fd;
+	struct ifreq ifr;
+
+	fd = socket(AF_INET, SOCK_DGRAM, 0);
+	ifr.ifr_addr.sa_family = AF_INET;
+	strncpy(ifr.ifr_name, "wlan0", IFNAMSIZ - 1);
+	ioctl(fd, SIOCGIFADDR, &ifr);
+	close(fd);
+	strcpy(s, inet_ntoa(((struct sockaddr_in *) &ifr.ifr_addr)->sin_addr));
+
+	ws2811_init(&ledstring);
+	while (TRUE)
+		ScrollString(s, Colors(rand() % 1536));
+}
+
 int main(int argc, char *argv[]) {
 
 	srand(time(NULL));
@@ -1251,6 +1271,10 @@ int main(int argc, char *argv[]) {
 		// LIGHTS RAINBOW
 		if (strcmp(argv[1], "rainbow") == 0)
 			StartService(RainbowLights);
+
+		// LIGHTS IP
+		if (strcmp(argv[1], "ip") == 0)
+			StartService(ShowIP);
 	}
 
 	// USAGE
@@ -1263,6 +1287,7 @@ int main(int argc, char *argv[]) {
 	printf("\trpilights green\tSet all lights to green\n");
 	printf("\trpilights magenta\tSet all lights to magenta\n");
 	printf("\trpilights cyan\tSet all lights to cyan\n");
-	printf("\trpilights rainbow\tDisplay rainbow pattern\n");
+	printf("\trpilights rainbow\tDisplay scrolling rainbow pattern\n");
+	printf("\trpilights ip\tDisplay scrolling IP address\n");
 	exit(0);
 }
