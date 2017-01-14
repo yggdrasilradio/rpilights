@@ -1215,10 +1215,6 @@ int main(int argc, char *argv[]) {
 		if (strcmp(argv[1], "on") == 0)
 			StartService(TimeDateWeather);
 
-		// LIGHTS TIMEDATEWEATHER
-		if (strcmp(argv[1], "timedateweather") == 0)
-			StartService(TimeDateWeather);
-
 		// LIGHTS OFF
 		if (strcmp(argv[1], "off") == 0)
 			SetAllLights(BLACK);
