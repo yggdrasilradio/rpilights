@@ -3,6 +3,8 @@ rpidisplay
 
 ![](misc/title.jpg)
 
+Software for LED window display such as the one in ![this video](https://www.youtube.com/watch?v=n9-j6oeJJw4).
+
 ### Hardware
 
 Instructions for making the hardware:
@@ -13,15 +15,16 @@ NOT DONE YET
 
 Put all the files into the directory /home/pi/rpilights
 
-The command "make" should build the "rpilights" command.
+The command "make" should build the "rpilights" command, but it won't work properly until you configure the map.txt file
+to reflect the physical layout of your LED display.
 
-NOT DONE YET
+### map.txt file
 
 The "map.txt" file describes the physical layout of your LED lights as an ASCII picture, viewed from the back of the display.
-The existing map.txt file is for a complicated two-channel multi-panel display that I have in my basement windows right now.  Please edit it to
-reflect the arrangement of your lights:
+The existing map.txt file is for a complicated two-channel multi-panel display that I have in my four basement windows right
+now.  Please edit it to reflect the arrangement of your lights:
 
-	Lowercase "o"	LED lights
+	o		LED lights
 	| and -		wires
 	0 and 1		The first LED light on channels 0 (pin 18) and 1 (pin 19)
 
@@ -46,6 +49,8 @@ For example, a simple 10x10 LED panel might look like this:
 	o  o  o  o  o  o  o  o  o  o
 	|  |  |  |  |  |  |  |  |  |
 	0  o--o  o--o  o--o  o--o  o
+
+### rpilights command
 
 The "rpilights" command by itself with no further arguments should give a list of possible commands:
 
