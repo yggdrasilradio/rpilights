@@ -70,6 +70,6 @@ The file misc/rc.local has suggested commands to add to your existing /etc/rc.lo
 
 ### updatewx script
 
-Edit the file misc/updatewx to put your zipcode in place of mine (55337).
+Edit the file scripts/updatewx to put your zipcode in place of mine (55337).
 This script gets weather info (forecast, temperature and humidity) every five minutes.
 You'll want to start this script from rc.local.
