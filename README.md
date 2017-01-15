@@ -3,7 +3,7 @@ rpidisplay
 
 ![](misc/title.jpg)
 
-Software for LED window display such as the one in ![this video](https://www.youtube.com/watch?v=n9-j6oeJJw4).
+Software for LED window display such as the one in [this video](https://www.youtube.com/watch?v=n9-j6oeJJw4).
 
 ### Hardware
 
@@ -24,7 +24,7 @@ The "map.txt" file describes the physical layout of your LED lights as an ASCII 
 The existing map.txt file is for a complicated two-channel multi-panel display that I have in my four basement windows right
 now.  Please edit it to reflect the arrangement of your lights:
 
-	o		LED lights
+	o			LED lights
 	| and -		wires
 	0 and 1		The first LED light on channels 0 (pin 18) and 1 (pin 19)
 
