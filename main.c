@@ -1221,6 +1221,55 @@ void ShowIP() {
 		ScrollString(s, Colors(rand() % 1536));
 }
 
+void Pacman() {
+
+	int32_t i, y, k = width;
+
+	ws2811_init(&ledstring);
+	y = floor((height - 10) / 2);
+
+	while (TRUE) {
+
+		// dots
+		setScreen(BLACK);
+		for (i = 2; i < width; i += 4) {
+			setPixel(i, y + 4, WHITE);
+			setPixel(i, y + 5, WHITE);
+			setPixel(i + 1, y + 4, WHITE);
+			setPixel(i + 1, y + 5, WHITE);
+		}
+		ws2811_render(&ledstring);
+
+		for (i = k; i > -k; i--) {
+			if (i & 1)
+				RenderSprite("/home/pi/rpilights/pacman/pacman1.gif.rgb", i, y, 47);
+			else
+				RenderSprite("/home/pi/rpilights/pacman/pacman2.gif.rgb", i, y, 47);
+			ws2811_render(&ledstring);
+			Delay();
+		}
+
+		// dots
+		setScreen(BLACK);
+		for (i = 2; i < width; i += 4) {
+			setPixel(i, y + 4, WHITE);
+			setPixel(i, y + 5, WHITE);
+			setPixel(i + 1, y + 4, WHITE);
+			setPixel(i + 1, y + 5, WHITE);
+		}
+		ws2811_render(&ledstring);
+
+		for (i = -k; i < k; i++) {
+			if (i & 1)
+				RenderSprite("/home/pi/rpilights/pacman/pacman3.gif.rgb", i, y, 47);
+			else
+				RenderSprite("/home/pi/rpilights/pacman/pacman4.gif.rgb", i, y, 47);
+			ws2811_render(&ledstring);
+			Delay();
+		}
+	}
+}
+
 int main(int argc, char *argv[]) {
 
 	srand(time(NULL));
@@ -1275,6 +1324,10 @@ int main(int argc, char *argv[]) {
 		// LIGHTS IP
 		if (strcmp(argv[1], "ip") == 0)
 			StartService(ShowIP);
+
+		// LIGHTS PACMAN
+		if (strcmp(argv[1], "pacman") == 0)
+			StartService(Pacman);
 	}
 
 	// USAGE
@@ -1289,5 +1342,6 @@ int main(int argc, char *argv[]) {
 	printf("\trpilights cyan\tSet all lights to cyan\n");
 	printf("\trpilights rainbow\tDisplay scrolling rainbow pattern\n");
 	printf("\trpilights ip\tDisplay scrolling IP address\n");
+	printf("\trpilights pacman\tDisplay Pacman animation\n");
 	exit(0);
 }

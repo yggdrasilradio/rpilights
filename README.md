@@ -63,6 +63,7 @@ The "rpilights" command by itself with no further arguments should give a list o
 	rpilights cyan		Set all lights to cyan
 	rpilights rainbow	Display scrolling rainbow pattern
 	rpilights ip		Display scrolling IP address
+	rpilights pacman	Display Pacman animation
 
 ### rc.local
 
