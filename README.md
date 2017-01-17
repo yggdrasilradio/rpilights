@@ -60,6 +60,7 @@ The "rpilights" command by itself with no further arguments should give a list o
 	rpilights blue		Set all lights to blue
 	rpilights green		Set all lights to green
 	rpilights magenta	Set all lights to magenta
+	rpilights yellow	Set all lights to yellow
 	rpilights cyan		Set all lights to cyan
 	rpilights rainbow	Display scrolling rainbow pattern
 	rpilights ip		Display scrolling IP address
