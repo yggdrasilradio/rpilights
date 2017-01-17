@@ -1332,16 +1332,16 @@ int main(int argc, char *argv[]) {
 
 	// USAGE
 	printf("Usage:");
-	printf("\trpilights on\tTurn lights on\n");
+	printf("\trpilights on\t\t\tTurn lights on\n");
 	printf("\trpilights timedateweather\tDisplay scrolling time, date, weather\n");
-	printf("\trpilights off\tTurn lights off\n");
-	printf("\trpilights red\tSet all lights to red\n");
-	printf("\trpilights blue\tSet all lights to blue\n");
-	printf("\trpilights green\tSet all lights to green\n");
-	printf("\trpilights magenta\tSet all lights to magenta\n");
-	printf("\trpilights cyan\tSet all lights to cyan\n");
-	printf("\trpilights rainbow\tDisplay scrolling rainbow pattern\n");
-	printf("\trpilights ip\tDisplay scrolling IP address\n");
-	printf("\trpilights pacman\tDisplay Pacman animation\n");
+	printf("\trpilights off\t\t\tTurn lights off\n");
+	printf("\trpilights red\t\t\tSet all lights to red\n");
+	printf("\trpilights blue\t\t\tSet all lights to blue\n");
+	printf("\trpilights green\t\t\tSet all lights to green\n");
+	printf("\trpilights magenta\t\tSet all lights to magenta\n");
+	printf("\trpilights cyan\t\t\tSet all lights to cyan\n");
+	printf("\trpilights rainbow\t\tDisplay scrolling rainbow pattern\n");
+	printf("\trpilights ip\t\t\tDisplay scrolling IP address\n");
+	printf("\trpilights pacman\t\tDisplay Pacman animation\n");
 	exit(0);
 }
