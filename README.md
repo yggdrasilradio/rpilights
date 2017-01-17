@@ -1,4 +1,4 @@
-rpidisplay
+rpilights
 ==========
 
 ![](misc/title.jpg)
