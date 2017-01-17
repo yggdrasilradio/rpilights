@@ -9,7 +9,7 @@ Software for LED window display such as the one in [this video](https://www.yout
 
 Lights [here](https://www.amazon.com/dp/B00QK8QE1A).
 
-Either mount in pegboard (holes every 2 inches drilled out to 22mm) or in 1/2 inch grid hardware cloth.
+Either mount in pegboard (holes every 2 inches drilled out to 12mm) or in 1/2 inch grid hardware cloth.
 
 ### Software
 
