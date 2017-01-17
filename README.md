@@ -7,9 +7,9 @@ Software for LED window display such as the one in [this video](https://www.yout
 
 ### Hardware
 
-Instructions for making the hardware:
+Lights [here](https://www.amazon.com/dp/B00QK8QE1A).
 
-NOT DONE YET
+Either mount in pegboard (holes every 2 inches drilled out to 22mm) or in 1/2 inch grid hardware cloth.
 
 ### Software
 
