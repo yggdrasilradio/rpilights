@@ -23,10 +23,10 @@
 #define DMA 5
 #define PIDFILE "/var/run/lights.pid"
 
-#define HOLIDAYS "/home/pi/rpilights/.holidays"		// Location of holiday definitions file
-#define TEMPERATURE "/home/pi/rpilights/.temperature"	// Location of temperature file
-#define FORECAST "/home/pi/rpilights/.forecast"		// Location of weather forecast file
-#define MAP "/home/pi/rpilights/map.txt"		// Location of LED map file
+#define HOLIDAYS "/home/pi/rpilights/.holidays"	// Location of holiday definitions file
+#define TEMPERATURE "/dev/shm/.temperature"	// Location of temperature file
+#define FORECAST "/dev/shm/.forecast"		// Location of weather forecast file
+#define MAP "/home/pi/rpilights/map.txt"	// Location of LED map file
 
 #define INT 50		// LED intensity (0 to 255) normally 50
 
@@ -52,6 +52,8 @@
 int16_t width = 0;
 int16_t height = 0;
 int16_t *ledmap = NULL;
+
+uint8_t bEnabled = TRUE;
 
 ws2811_t ledstring = {
 
@@ -188,7 +190,7 @@ static const uint8_t font5x8[] = {
 	0x04, 0x02, 0x01, 0x02, 0x04, // ^
 	0x40, 0x40, 0x40, 0x40, 0x40, // _
 	0x02, 0x05, 0x02, 0x00, 0x00, // ` (degree symbol)
-	0x20, 0x54, 0x54, 0x54, 0x78, // a
+	0x38, 0x44, 0x44, 0x24, 0x7c, // 0x20, 0x54, 0x54, 0x54, 0x78, // a
 	0x7F, 0x48, 0x44, 0x44, 0x38, // b
 	0x38, 0x44, 0x44, 0x44, 0x28, // c
 	0x38, 0x44, 0x44, 0x48, 0x7F, // d
@@ -415,6 +417,11 @@ void Delay() {
 	usleep(70000);
 }
 
+void Render() {
+	if (bEnabled)
+		ws2811_render(&ledstring);
+}
+
 // angle : 0 - 1536
 uint32_t Colors(uint32_t angle) {
 
@@ -455,7 +462,7 @@ void ScrollString(uint8_t *s, uint32_t color) {
 		Draw5x8String(s, width - i, y + 1, color);
 		itime++;
 
-		ws2811_render(&ledstring);
+		Render();
 		Delay();
 	}
 }
@@ -637,7 +644,7 @@ void TimeDateWeather () {
 				}
 			}
 
-			ws2811_render(&ledstring);
+			Render();
 			Delay();
 		}
 
@@ -747,7 +754,7 @@ void RainbowLights() {
 				setPixel(i, j, color);
 		}
 		Delay();
-		ws2811_render(&ledstring);
+		Render();
 	}
 }
 
@@ -801,11 +808,11 @@ void DrawShapes(uint32_t duration) {
 			}
 		}
 
-		ws2811_render(&ledstring);
+		Render();
 		Delay();
 	}
 	clearScreen();
-	ws2811_render(&ledstring);
+	Render();
 }
 
 void DrawPicture(const uint8_t **picture, uint32_t *x, uint32_t *y, uint32_t xdelta, uint32_t ydelta) {
@@ -888,6 +895,9 @@ void DrawCircle(uint32_t x0, uint32_t y0, uint32_t size, uint32_t color) {
 
 static void kill_handler(uint32_t signum) {
 
+	bEnabled = FALSE;
+	Delay();
+	Delay();
 	ws2811_init(&ledstring);
 	clearScreen();
 	ws2811_render(&ledstring);
@@ -1133,7 +1143,7 @@ void PlayFrames() {
 			bExists = FileExists(filename);
 			if (bExists) {
 				RenderFile(filename);
-				ws2811_render(&ledstring);
+				Render();
 				Delay();
 			}
 		} while (bExists);
@@ -1187,7 +1197,7 @@ void SetAllLights(uint32_t color) {
 	StopService();
 	ws2811_init(&ledstring);
 	setScreen(color);
-	ws2811_render(&ledstring);
+	Render();
 	ws2811_fini(&ledstring);
 	exit(0);
 }
@@ -1198,7 +1208,7 @@ void ShowFrame() {
 	StopService();
 	ws2811_init(&ledstring);
 	RenderFile("/home/pi/rpilights/lights.gif.rgb");
-	ws2811_render(&ledstring);
+	Render();
 	ws2811_fini(&ledstring);
 	exit(0);
 }
@@ -1238,14 +1248,14 @@ void Pacman() {
 			setPixel(i + 1, y + 4, WHITE);
 			setPixel(i + 1, y + 5, WHITE);
 		}
-		ws2811_render(&ledstring);
+		Render();
 
 		for (i = k; i > -k; i--) {
 			if (i & 1)
 				RenderSprite("/home/pi/rpilights/pacman/pacman1.gif.rgb", i, y, 47);
 			else
 				RenderSprite("/home/pi/rpilights/pacman/pacman2.gif.rgb", i, y, 47);
-			ws2811_render(&ledstring);
+			Render();
 			Delay();
 		}
 
@@ -1257,14 +1267,14 @@ void Pacman() {
 			setPixel(i + 1, y + 4, WHITE);
 			setPixel(i + 1, y + 5, WHITE);
 		}
-		ws2811_render(&ledstring);
+		Render();
 
 		for (i = -k; i < k; i++) {
 			if (i & 1)
 				RenderSprite("/home/pi/rpilights/pacman/pacman3.gif.rgb", i, y, 47);
 			else
 				RenderSprite("/home/pi/rpilights/pacman/pacman4.gif.rgb", i, y, 47);
-			ws2811_render(&ledstring);
+			Render();
 			Delay();
 		}
 	}
