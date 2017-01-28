@@ -13,7 +13,7 @@ Feng Shui with his listings.
 Either mount in pegboard (holes every 2 inches drilled out to 12mm) or in 1/2 inch grid hardware cloth.
 
 You will an external 5v power supply to power the lights if there are more than 100 or so.
-I use [this one](https://www.amazon.com/gp/B00EZJFMKU).
+I use [this one](https://www.amazon.com/dp/B00EZJFMKU).
 The +5v and GND will need to be
 connected to the power wires around every 200 lights due to internal resistance of the wires and circuitry.  Otherwise you will
 see the intensity of the lights dim noticeably at the far end.
