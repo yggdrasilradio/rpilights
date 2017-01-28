@@ -53,8 +53,6 @@ int16_t width = 0;
 int16_t height = 0;
 int16_t *ledmap = NULL;
 
-uint8_t bEnabled = TRUE;
-
 ws2811_t ledstring = {
 
     .freq = TARGET_FREQ,
@@ -418,8 +416,7 @@ void Delay() {
 }
 
 void Render() {
-	if (bEnabled)
-		ws2811_render(&ledstring);
+	ws2811_render(&ledstring);
 }
 
 // angle : 0 - 1536
@@ -895,9 +892,7 @@ void DrawCircle(uint32_t x0, uint32_t y0, uint32_t size, uint32_t color) {
 
 static void kill_handler(uint32_t signum) {
 
-	bEnabled = FALSE;
-	Delay();
-	Delay();
+	ws2811_fini(&ledstring);
 	ws2811_init(&ledstring);
 	clearScreen();
 	ws2811_render(&ledstring);
