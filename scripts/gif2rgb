@@ -1,0 +1,1 @@
+convert -depth 8 $1 rgb: > $1.rgb
