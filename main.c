@@ -250,13 +250,13 @@ void clearScreen() {
 			setPixel(i, j, BLACK);
 }
 
-uint32_t fadePixel(uint32_t color) {
+uint32_t fadePixel(uint32_t color, double fraction) {
 
 	uint32_t r, g, b;
 
-	r = ExtractR(color) * .60;
-	g = ExtractG(color) * .60;
-	b = ExtractB(color) * .60;
+	r = ExtractR(color) * fraction;
+	g = ExtractG(color) * fraction;
+	b = ExtractB(color) * fraction;
 	return RGB(r, g, b);
 }
 
@@ -308,14 +308,14 @@ void setScreen(uint32_t color) {
 			setPixel(i, j, color);
 }
 
-void fadeScreen() {
+void fadeScreen(double fraction) {
 
 	uint32_t i, j, color;
 
 	for (i = 0; i < width; i++)
 		for (j = 0; j < height; j++) {
 			color = getPixel(i, j);
-			color = fadePixel(color);
+			color = fadePixel(color, fraction);
 			setPixel(i, j, color);
 		}
 }
@@ -680,62 +680,6 @@ void TimeDateWeather () {
 	}
 }
 
-uint32_t GetColor(uint8_t c) {
-
-	switch (c) {
-		case 'r':
-			return RGB(255, 0, 0); // red
-		case 'R':
-			if (rand() % 100 > 75)
-				return RGB(255, 0, 0); // red
-			else
-				return RGB(255 / 2, 0, 0); // dark red
-		case 'y':
-			return RGB(255, 255, 0); // yellow
-		case 'Y':
-			if (rand() % 100 > 75)
-				return RGB(255, 255, 0); // yellow
-			else
-				return RGB(255 / 2, 255 / 2, 0); // dark yellow
-		case 'g':
-			return RGB(0, 255, 0); // green
-		case 'c':
-			return RGB(0, 255, 255); // cyan (blue-green)
-		case 'C':
-			if (rand() % 100 > 75)
-				return RGB(0, 255, 255); // cyan
-			else
-				return RGB(0, 255 / 2, 255 / 2); // dark cyan
-		case 'b':
-			return RGB(0, 0, 255); // blue
-		case 'B':
-			if (rand() % 100 > 75)
-				return RGB(0, 0, 255); // blue
-			else
-				return RGB(0, 0, 255 / 2); // dark blue
-		case 'm':
-			return RGB(255, 0, 255); // magenta
-		case 'w':
-			return RGB(255, 255, 255); // white
-		case 'I':
-			return RGB(255 / 3, 255 / 3, 255); // light blue
-		case 'O':
-			return RGB(255, 255 / 2, 0); // orange
-		case 'p':
-			return RGB(255 / 2, 0, 255 / 2); // purple
-		case 'P':
-			return RGB(255, 0, 255 / 2); // pink
-		case 'W':
-			if (rand() % 100 > 75)
-				return RGB(255 / 2, 255 / 2, 255 / 2); // grey
-			else
-				return RGB(255, 255, 255); // white
-		case '.':
-			return RGB(0, 0, 0); // black
-	}
-	return RGB(0, 0, 0);
-}
-
 void RainbowLights() {
 
 	uint32_t i, j, initcolor, color;
@@ -775,7 +719,7 @@ void DrawShapes(uint32_t duration) {
 	clearScreen();
 	for (i = 0; i < duration; i++) {
 
-		fadeScreen();
+		fadeScreen(0.60);
 
 		// create a shape if necessary
 		if (i % 4 == 0) {
@@ -812,18 +756,28 @@ void DrawShapes(uint32_t duration) {
 	Render();
 }
 
-void DrawPicture(const uint8_t **picture, uint32_t *x, uint32_t *y, uint32_t xdelta, uint32_t ydelta) {
+void Lines() {
 
-	uint32_t i, j;
+	int32_t x0, y0, x1, y1;
+	uint32_t color;
 
-	clearScreen();
-	for (i = 0; i < height; i++) {
-		uint8_t *p = picture[i];
-		for (j = 0; p[j] != '\0'; j++)
-			setPixel(*x + j, *y + i, GetColor(p[j]));
+	ws2811_init(&ledstring);
+	while (TRUE) {
+		color = Colors(rand() % 1536);
+		x0 = rand() % width;
+		x1 = rand() % width;
+		fadeScreen(0.90);
+		DrawLine(x0, 0, x1, height - 1, color);
+		Render();
+		Delay();
+		color = Colors(rand() % 1536);
+		y0 = rand() % height;
+		y1 = rand() % height;
+		fadeScreen(0.90);
+		DrawLine(0, y0, width - 1, y1, color);
+		Render();
+		Delay();
 	}
-	*x += xdelta;
-	*y += ydelta;
 }
 
 void DrawLine(int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint32_t color) {
@@ -832,7 +786,7 @@ void DrawLine(int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint32_t color) {
 	int dy = abs(y1 - y0), sy = y0 < y1 ? 1 : -1; 
 	int err = (dx > dy ? dx : -dy) / 2, e2;
  
-	for(;;){
+	while (TRUE) {
 		setPixelNoWrap(x0, y0, color);
 		if (x0 == x1 && y0 == y1)
 			break;
@@ -1226,6 +1180,20 @@ void ShowIP() {
 		ScrollString(s, Colors(rand() % 1536));
 }
 
+void Snow() {
+
+	int32_t i;
+
+	ws2811_init(&ledstring);
+	while (TRUE) {
+		for (i = 0; i < height; i++) {
+			RenderSprite("/home/pi/rpilights/snow/snow.gif.rgb", 0, i, width);
+			Delay();
+			Render();
+		}
+	}
+}
+
 void Pacman() {
 
 	int32_t i, y, k = width;
@@ -1285,15 +1253,15 @@ int main(int argc, char *argv[]) {
 
 	if (argc == 2) {
 
-		// LIGHTS ON
+		// RPILIGHTS ON
 		if (strcmp(argv[1], "on") == 0)
 			StartService(TimeDateWeather);
 
-		// LIGHTS OFF
+		// RPILIGHTS OFF
 		if (strcmp(argv[1], "off") == 0)
 			SetAllLights(BLACK);
 
-		// LIGHTS STATUS
+		// RPILIGHTS STATUS
 		if (strcmp(argv[1], "status") == 0) {
 			if (FileExists(PIDFILE))
 				printf("Lights are on.\n");
@@ -1302,41 +1270,50 @@ int main(int argc, char *argv[]) {
 			exit(0);
 		}
 
-		// LIGHTS RED
+		// RPILIGHTS RED
 		if (strcmp(argv[1], "red") == 0)
 			SetAllLights(RED);
 
-		// LIGHTS GREEN
+		// RPILIGHTS GREEN
 		if (strcmp(argv[1], "green") == 0)
 			SetAllLights(GREEN);
 
-		// LIGHTS BLUE
+		// RPILIGHTS BLUE
 		if (strcmp(argv[1], "blue") == 0)
 			SetAllLights(BLUE);
 
-		// LIGHTS MAGENTA
+		// RPILIGHTS MAGENTA
 		if (strcmp(argv[1], "magenta") == 0)
 			SetAllLights(MAGENTA);
 
-		// LIGHTS YELLOW
+		// RPILIGHTS YELLOW
 		if (strcmp(argv[1], "yellow") == 0)
 			SetAllLights(YELLOW);
 
-		// LIGHTS CYAN
+		// RPILIGHTS CYAN
 		if (strcmp(argv[1], "cyan") == 0)
 			SetAllLights(CYAN);
 
-		// LIGHTS RAINBOW
+		// RPILIGHTS RAINBOW
 		if (strcmp(argv[1], "rainbow") == 0)
 			StartService(RainbowLights);
 
-		// LIGHTS IP
+		// RPILIGHTS IP
 		if (strcmp(argv[1], "ip") == 0)
 			StartService(ShowIP);
 
-		// LIGHTS PACMAN
+		// RPILIGHTS PACMAN
 		if (strcmp(argv[1], "pacman") == 0)
 			StartService(Pacman);
+
+		// RPILIGHTS SNOW
+		if (strcmp(argv[1], "snow") == 0)
+			StartService(Snow);
+
+		// RPILIGHTS LINES
+		if (strcmp(argv[1], "lines") == 0)
+			StartService(Lines);
+
 	}
 
 	// USAGE
@@ -1352,5 +1329,7 @@ int main(int argc, char *argv[]) {
 	printf("\trpilights rainbow\tDisplay scrolling rainbow pattern\n");
 	printf("\trpilights ip\t\tDisplay scrolling IP address\n");
 	printf("\trpilights pacman\tDisplay Pacman animation\n");
+	printf("\trpilights snow\tDisplay snow animation\n");
+	printf("\trpilights lines\tDisplay random lines\n");
 	exit(0);
 }
