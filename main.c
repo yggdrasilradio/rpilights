@@ -52,6 +52,7 @@
 int16_t width = 0;
 int16_t height = 0;
 int16_t *ledmap = NULL;
+uint32_t *ledvalues = NULL;
 
 ws2811_t ledstring = {
 
@@ -268,6 +269,7 @@ void setPixel(int32_t x, int32_t y, uint32_t color) {
 		return;
 	if (x >= width)
 		return;
+	ledvalues[(y % height) * width + x] = color;
 	value = ledmap[(y % height) * width + x];
 	if (value < 0)
 		return;
@@ -284,12 +286,7 @@ uint32_t getPixel(int32_t x, int32_t y) {
 		return 0;
 	if (x >= width)
 		return 0;
-	value = ledmap[(y % height) * width + x];
-	if (value < 0)
-		return 0;
-	channel = value & 1;
-	value = value / 2;
-	return ledstring.channel[channel].leds[value];
+	return ledvalues[(y % height) * width + x];
 }
 
 void setPixelNoWrap(uint32_t x, uint32_t y, uint32_t color) {
@@ -485,14 +482,12 @@ uint8_t Do5x8String(uint8_t *s, uint32_t color, uint32_t *i, int32_t y) {
 
 uint8_t Do5x5String(uint8_t *s, uint32_t color, uint32_t *i, int32_t y) {
 
-	uint32_t j;
-	uint32_t bcolor;
+	uint32_t j, bcolor;
 	uint32_t k = width;
 	int32_t n = strlen(s) - 1;
 
 	if (n <= 0)
 		return(TRUE);
-
 	Draw5x5String(s, width - *i, y, color);
 	itime++;
 	(*i)++;
@@ -500,6 +495,62 @@ uint8_t Do5x5String(uint8_t *s, uint32_t color, uint32_t *i, int32_t y) {
 		return(FALSE);
 	else
 		return(TRUE);
+}
+
+void scrollLeft() {
+
+	uint32_t arr[height];
+	int32_t i, j;
+
+	for (j = 0; j < height; j++)
+		arr[j] = getPixel(0, j);
+	for (i = 1; i < width; i++)
+		for (j = 0; j < height; j++)
+			setPixel(i - 1, j, getPixel(i, j));
+	for (j = 0; j < height; j++)
+		setPixel(width - 1, j, arr[j]);
+}
+
+void scrollRight() {
+
+	uint32_t arr[height];
+	int32_t i, j;
+
+	for (j = 0; j < height; j++)
+		arr[j] = getPixel(width - 1, j);
+	for (i = width - 1; i > 0; i--)
+		for (j = 0; j < height; j++)
+			setPixel(i, j, getPixel(i - 1, j));
+	for (j = 0; j < height; j++)
+		setPixel(0, j, arr[j]);
+}
+
+void scrollUp() {
+
+	uint32_t arr[width];
+	int32_t i, j;
+
+	for (i = 0; i < width; i++)
+		arr[i] = getPixel(i, 0);
+	for (j = 1; j < height; j++)
+		for (i = 0; i < width; i++)
+			setPixel(i, j - 1, getPixel(i, j));
+	for (i = 0; i < width; i++)
+		setPixel(i, height - 1, arr[i]);
+}
+
+void scrollDown() {
+
+	uint32_t arr[width];
+	int32_t i, j;
+
+	for (i = 0; i < width; i++)
+		arr[i] = getPixel(i, height - 1);
+	for (j = height - 1; j > 0; j--)
+		for (i = 0; i < width; i++)
+			setPixel(i, j, getPixel(i, j - 1));
+	for (i = 0; i < width; i++)
+		setPixel(i, 0, arr[i]);
 }
 
 void TimeDateWeather () {
@@ -516,7 +567,7 @@ void TimeDateWeather () {
 		uint8_t s[300];
 		uint32_t color;
 	} arr[10];
-	char temp[10];
+	uint8_t temp[10];
 
 	itime = 0;
 	uint32_t bgcolor = BLACK;
@@ -954,8 +1005,11 @@ void ReadMap() {
 			strcat(words[j], " ");
 
 	ledmap = (int16_t*) malloc(width * height * sizeof(int16_t));
+	ledvalues = (int32_t*) malloc(width * height * sizeof(int32_t));
 	for (j = 0; j < width * height; j++)
 		ledmap[j] = -1;
+	for (j = 0; j < width * height; j++)
+		ledvalues[j] = BLACK;
 
 	// Trace out channel 0
 	xcurr = xchannel0;
@@ -1020,6 +1074,7 @@ void ReadMap() {
 		ledstring.channel[1].brightness = INT;
 		ledstring.channel[1].count = k;
 	}
+
 }
 
 void RenderSprite(uint8_t *filename, int32_t xpos, int32_t ypos, int32_t width) {
@@ -1185,12 +1240,24 @@ void Snow() {
 	int32_t i;
 
 	ws2811_init(&ledstring);
+	RenderFile("/home/pi/rpilights/images/snow.gif.rgb");
 	while (TRUE) {
-		for (i = 0; i < height; i++) {
-			RenderSprite("/home/pi/rpilights/snow/snow.gif.rgb", 0, i, width);
-			Delay();
-			Render();
-		}
+		scrollDown();
+		Delay();
+		Render();
+	}
+}
+
+void Hearts() {
+
+	int32_t i;
+
+	ws2811_init(&ledstring);
+	RenderFile("/home/pi/rpilights/images/hearts.gif.rgb");
+	while (TRUE) {
+		scrollLeft();
+		Delay();
+		Render();
 	}
 }
 
@@ -1215,9 +1282,9 @@ void Pacman() {
 
 		for (i = k; i > -k; i--) {
 			if (i & 1)
-				RenderSprite("/home/pi/rpilights/pacman/pacman1.gif.rgb", i, y, 47);
+				RenderSprite("/home/pi/rpilights/images/pacman1.gif.rgb", i, y, 47);
 			else
-				RenderSprite("/home/pi/rpilights/pacman/pacman2.gif.rgb", i, y, 47);
+				RenderSprite("/home/pi/rpilights/images/pacman2.gif.rgb", i, y, 47);
 			Render();
 			Delay();
 		}
@@ -1234,9 +1301,9 @@ void Pacman() {
 
 		for (i = -k; i < k; i++) {
 			if (i & 1)
-				RenderSprite("/home/pi/rpilights/pacman/pacman3.gif.rgb", i, y, 47);
+				RenderSprite("/home/pi/rpilights/images/pacman3.gif.rgb", i, y, 47);
 			else
-				RenderSprite("/home/pi/rpilights/pacman/pacman4.gif.rgb", i, y, 47);
+				RenderSprite("/home/pi/rpilights/images/pacman4.gif.rgb", i, y, 47);
 			Render();
 			Delay();
 		}
@@ -1314,6 +1381,10 @@ int main(int argc, char *argv[]) {
 		if (strcmp(argv[1], "lines") == 0)
 			StartService(Lines);
 
+		// RPILIGHTS HEARTS
+		if (strcmp(argv[1], "hearts") == 0)
+			StartService(Hearts);
+
 	}
 
 	// USAGE
@@ -1329,7 +1400,8 @@ int main(int argc, char *argv[]) {
 	printf("\trpilights rainbow\tDisplay scrolling rainbow pattern\n");
 	printf("\trpilights ip\t\tDisplay scrolling IP address\n");
 	printf("\trpilights pacman\tDisplay Pacman animation\n");
-	printf("\trpilights snow\tDisplay snow animation\n");
-	printf("\trpilights lines\tDisplay random lines\n");
+	printf("\trpilights snow\t\tDisplay snow animation\n");
+	printf("\trpilights lines\t\tDisplay random lines\n");
+	printf("\trpilights hearts\t\tDisplay scrolling hearts animation\n");
 	exit(0);
 }
