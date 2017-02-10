@@ -101,6 +101,7 @@ The "rpilights" command by itself with no further arguments should give a list o
 	rpilights pacman	Display Pacman animation
 	rpilights snow		Display snow animation
 	rpilights lines		Display lines animation
+	rpilights hearts	Display scrolling hearts animation
 
 ### rc.local
 
