@@ -37,9 +37,16 @@ Put all the files into the directory /home/pi/rpilights
 The command "make" should build the "rpilights" command, but it won't work properly until you configure the map.txt file
 to reflect the physical layout of your LED display.
 
-The "snow" animation vertically scrolls the graphic data in the file snow/snow.gif.rgb.  This file is generated from the script gif2rgb
-via the command "gif2rgb snow.gif" -- make your own file with the dimensions of your display, as the existing data may not match those
-dimensions.
+The "snow" animation vertically scrolls the graphic data in the file images/snow.gif.rgb.
+
+The "hearts" animation horizontally scrolls the graphic data in the file images/hearts.gif.rgb.
+
+The hearts.gif.rgb and snow.gif.rgb files are generated from the script gif2rgb via the commands:
+
+	gif2rgb hearts.gif
+	gif2rgb snow.gif
+
+Make your own files with the dimensions of your display, as the existing data probably doesn't match those dimensions.
 
 ### map.txt file
 
