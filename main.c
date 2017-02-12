@@ -244,8 +244,7 @@ uint32_t ExtractB(uint32_t color) {
 
 void clearScreen() {
 
-	uint32_t i, j;
-
+	int32_t i, j;
 	for (i = 0; i < width; i++)
 		for (j = 0; j < height; j++)
 			setPixel(i, j, BLACK);
@@ -1077,13 +1076,32 @@ void ReadMap() {
 
 }
 
-void RenderSprite(uint8_t *filename, int32_t xpos, int32_t ypos, int32_t width) {
+void GetGIFDimensions(uint8_t *filename, int32_t *width, int32_t *height) {
 
-	uint8_t mbyte[3], byte[3];
+	uint8_t bytes[20], giffilename[256], *p;
+
+	*width = 0;
+	*height = 0;
+	strncpy(giffilename, filename, sizeof(giffilename) / sizeof(giffilename[0]));
+	p = strstr(giffilename, ".rgb");
+	if (p != NULL)
+		*p = '\0';
+	FILE *fp = fopen(giffilename, "rb");
+	if (fread(bytes, sizeof(bytes[0]), 10, fp) != NULL) {
+		*width = bytes[7] * 256 + bytes[6];
+		*height = bytes[9] * 256 + bytes[8];
+	}
+	fclose(fp);
+}
+
+void RenderSprite(uint8_t *filename, int32_t xpos, int32_t ypos) {
+
+	uint8_t byte[3];
 	uint32_t color;
-	int32_t x, y;
-	FILE *fp = fopen(filename, "rb");
+	int32_t x, y, xwidth, yheight;
 
+	GetGIFDimensions(filename, &xwidth, &yheight);
+	FILE *fp = fopen(filename, "rb");
 	if (!fp) {
 		printf("Unable to open file %s\n", filename);
 		exit(1);
@@ -1094,7 +1112,7 @@ void RenderSprite(uint8_t *filename, int32_t xpos, int32_t ypos, int32_t width) 
 		color = RGB(byte[0], byte[1], byte[2]);
 		setPixel(xpos + x, ypos + y, color);
 		x++;
-		if (x >= width) {
+		if (x >= xwidth) {
 			x = 0;
 			y++;
 		}
@@ -1102,10 +1120,41 @@ void RenderSprite(uint8_t *filename, int32_t xpos, int32_t ypos, int32_t width) 
 	fclose(fp);
 }
 
+void RenderSlice(uint8_t *filename, int32_t xpos, uint32_t *slice) {
+
+	uint8_t byte[3];
+	uint32_t x, y, color;
+	int32_t xwidth, yheight;
+
+	GetGIFDimensions(filename, &xwidth, &yheight);
+	FILE *fp = fopen(filename, "rb");
+	if (!fp) {
+		printf("Unable to open file %s\n", filename);
+		exit(1);
+	}
+	x = 0;
+	y = 0;
+	while(fread(byte, sizeof(byte[0]), 3, fp) != NULL) {
+		color = RGB(byte[0], byte[1], byte[2]);
+		if (x++ == xpos)
+			slice[y] = color;
+		if (x >= xwidth) {
+			x = 0;
+			y++;
+			if (y >= height)
+				y = 0;
+		}
+	}
+	fclose(fp);
+}
+
 void RenderFile(uint8_t *filename) {
 
-	uint8_t mbyte[3], byte[3];
-	uint32_t x, y, mcolor, color;
+	uint8_t byte[3];
+	uint32_t color;
+	int32_t x, y, xwidth, yheight;
+
+	GetGIFDimensions(filename, &xwidth, &yheight);
 	FILE *fp = fopen(filename, "rb");
 	if (!fp) {
 		printf("Unable to open file %s\n", filename);
@@ -1117,10 +1166,10 @@ void RenderFile(uint8_t *filename) {
 	while(fread(byte, sizeof(byte[0]), 3, fp) != NULL) {
 		color = RGB(byte[0], byte[1], byte[2]);
 		setPixel(x++, y, color);
-		if (x >= width) {
+		if (x >= xwidth) {
 			x = 0;
 			y++;
-			if (y >= height)
+			if (y >= yheight)
 				y = 0;
 		}
 	}
@@ -1235,6 +1284,27 @@ void ShowIP() {
 		ScrollString(s, Colors(rand() % 1536));
 }
 
+void Valentines() {
+
+	uint32_t slice[height];
+	int32_t x, y, xwidth, yheight;
+
+	ws2811_init(&ledstring);
+	GetGIFDimensions("/home/pi/rpilights/images/valentines.gif.rgb", &xwidth, &yheight);
+	RenderFile("/home/pi/rpilights/images/valentines.gif.rgb");
+	Render();
+	x = width;
+	while (TRUE) {
+		Delay();
+		scrollLeft();
+		RenderSlice("/home/pi/rpilights/images/valentines.gif.rgb", x, slice);
+		for (y = 0; y < height; y++)
+			setPixel(width - 1, y, slice[y]);
+		x = ++x % xwidth;
+		Render();
+	}
+}
+
 void Snow() {
 
 	int32_t i;
@@ -1243,19 +1313,6 @@ void Snow() {
 	RenderFile("/home/pi/rpilights/images/snow.gif.rgb");
 	while (TRUE) {
 		scrollDown();
-		Delay();
-		Render();
-	}
-}
-
-void Hearts() {
-
-	int32_t i;
-
-	ws2811_init(&ledstring);
-	RenderFile("/home/pi/rpilights/images/hearts.gif.rgb");
-	while (TRUE) {
-		scrollLeft();
 		Delay();
 		Render();
 	}
@@ -1282,9 +1339,9 @@ void Pacman() {
 
 		for (i = k; i > -k; i--) {
 			if (i & 1)
-				RenderSprite("/home/pi/rpilights/images/pacman1.gif.rgb", i, y, 47);
+				RenderSprite("/home/pi/rpilights/images/pacman1.gif.rgb", i, y);
 			else
-				RenderSprite("/home/pi/rpilights/images/pacman2.gif.rgb", i, y, 47);
+				RenderSprite("/home/pi/rpilights/images/pacman2.gif.rgb", i, y);
 			Render();
 			Delay();
 		}
@@ -1301,9 +1358,9 @@ void Pacman() {
 
 		for (i = -k; i < k; i++) {
 			if (i & 1)
-				RenderSprite("/home/pi/rpilights/images/pacman3.gif.rgb", i, y, 47);
+				RenderSprite("/home/pi/rpilights/images/pacman3.gif.rgb", i, y);
 			else
-				RenderSprite("/home/pi/rpilights/images/pacman4.gif.rgb", i, y, 47);
+				RenderSprite("/home/pi/rpilights/images/pacman4.gif.rgb", i, y);
 			Render();
 			Delay();
 		}
@@ -1381,9 +1438,9 @@ int main(int argc, char *argv[]) {
 		if (strcmp(argv[1], "lines") == 0)
 			StartService(Lines);
 
-		// RPILIGHTS HEARTS
-		if (strcmp(argv[1], "hearts") == 0)
-			StartService(Hearts);
+		// RPILIGHTS VALENTINES
+		if (strcmp(argv[1], "valentines") == 0)
+			StartService(Valentines);
 
 	}
 
@@ -1401,7 +1458,6 @@ int main(int argc, char *argv[]) {
 	printf("\trpilights ip\t\tDisplay scrolling IP address\n");
 	printf("\trpilights pacman\tDisplay Pacman animation\n");
 	printf("\trpilights snow\t\tDisplay snow animation\n");
-	printf("\trpilights lines\t\tDisplay random lines\n");
-	printf("\trpilights hearts\t\tDisplay scrolling hearts animation\n");
+	printf("\trpilights valentines\tDisplay Valentine's Day animation\n");
 	exit(0);
 }
