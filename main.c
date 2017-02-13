@@ -27,6 +27,7 @@
 #define TEMPERATURE "/dev/shm/.temperature"	// Location of temperature file
 #define FORECAST "/dev/shm/.forecast"		// Location of weather forecast file
 #define MAP "/home/pi/rpilights/map.txt"	// Location of LED map file
+#define COMMAND "/home/pi/rpilights/.command"	// Location of previous animation file
 
 #define INT 50		// LED intensity (0 to 255) normally 50
 
@@ -53,6 +54,7 @@ int16_t width = 0;
 int16_t height = 0;
 int16_t *ledmap = NULL;
 uint32_t *ledvalues = NULL;
+uint8_t command[128];
 
 ws2811_t ledstring = {
 
@@ -413,6 +415,12 @@ void Delay() {
 
 void Render() {
 	ws2811_render(&ledstring);
+}
+
+WriteCommand() {
+	FILE *fp = fopen(COMMAND, "w");
+	fprintf(fp, "%s\n", command);
+	fclose(fp);
 }
 
 // angle : 0 - 1536
@@ -1234,6 +1242,7 @@ void StartService(void (*procedure)(void)) {
 	StopService();
 	mypid = fork();
 	if (mypid == 0) {
+		WriteCommand();
 		procedure();
 	} else {
 		FILE *fp = fopen(PIDFILE, "w");
@@ -1248,6 +1257,8 @@ void SetAllLights(uint32_t color) {
 
 	RootCheck();
 	StopService();
+	if (color != BLACK)
+		WriteCommand();
 	ws2811_init(&ledstring);
 	setScreen(color);
 	Render();
@@ -1377,13 +1388,11 @@ int main(int argc, char *argv[]) {
 
 	if (argc == 2) {
 
-		// RPILIGHTS ON
-		if (strcmp(argv[1], "on") == 0)
-			StartService(TimeDateWeather);
-
 		// RPILIGHTS OFF
-		if (strcmp(argv[1], "off") == 0)
+		if (strcmp(argv[1], "off") == 0) {
 			SetAllLights(BLACK);
+			exit(0);
+		}
 
 		// RPILIGHTS STATUS
 		if (strcmp(argv[1], "status") == 0) {
@@ -1394,60 +1403,75 @@ int main(int argc, char *argv[]) {
 			exit(0);
 		}
 
+		// RPILIGHTS ON: turn on lights using last animation
+		strncpy(command, argv[1], 128);
+		if (strcmp(argv[1], "on") == 0) {
+			FILE *fp = fopen(COMMAND, "r");
+			if (fp != NULL) {
+				fscanf(fp, "%s\n", command);
+				fclose(fp);
+			} else
+				strcpy(command, "ip"); // default animation
+		}
+
+		// RPILIGHTS WEATHER
+		if (strcmp(command, "weather") == 0)
+			StartService(TimeDateWeather);
+
 		// RPILIGHTS RED
-		if (strcmp(argv[1], "red") == 0)
+		if (strcmp(command, "red") == 0)
 			SetAllLights(RED);
 
 		// RPILIGHTS GREEN
-		if (strcmp(argv[1], "green") == 0)
+		if (strcmp(command, "green") == 0)
 			SetAllLights(GREEN);
 
 		// RPILIGHTS BLUE
-		if (strcmp(argv[1], "blue") == 0)
+		if (strcmp(command, "blue") == 0)
 			SetAllLights(BLUE);
 
 		// RPILIGHTS MAGENTA
-		if (strcmp(argv[1], "magenta") == 0)
+		if (strcmp(command, "magenta") == 0)
 			SetAllLights(MAGENTA);
 
 		// RPILIGHTS YELLOW
-		if (strcmp(argv[1], "yellow") == 0)
+		if (strcmp(command, "yellow") == 0)
 			SetAllLights(YELLOW);
 
 		// RPILIGHTS CYAN
-		if (strcmp(argv[1], "cyan") == 0)
+		if (strcmp(command, "cyan") == 0)
 			SetAllLights(CYAN);
 
 		// RPILIGHTS RAINBOW
-		if (strcmp(argv[1], "rainbow") == 0)
+		if (strcmp(command, "rainbow") == 0)
 			StartService(RainbowLights);
 
 		// RPILIGHTS IP
-		if (strcmp(argv[1], "ip") == 0)
+		if (strcmp(command, "ip") == 0)
 			StartService(ShowIP);
 
 		// RPILIGHTS PACMAN
-		if (strcmp(argv[1], "pacman") == 0)
+		if (strcmp(command, "pacman") == 0)
 			StartService(Pacman);
 
 		// RPILIGHTS SNOW
-		if (strcmp(argv[1], "snow") == 0)
+		if (strcmp(command, "snow") == 0)
 			StartService(Snow);
 
 		// RPILIGHTS LINES
-		if (strcmp(argv[1], "lines") == 0)
+		if (strcmp(command, "lines") == 0)
 			StartService(Lines);
 
 		// RPILIGHTS VALENTINES
-		if (strcmp(argv[1], "valentines") == 0)
+		if (strcmp(command, "valentines") == 0)
 			StartService(Valentines);
-
 	}
 
 	// USAGE
 	printf("Usage:");
-	printf("\trpilights on\t\tTurn lights on\n");
+	printf("\trpilights on\t\tTurn lights on (show last animation)\n");
 	printf("\trpilights off\t\tTurn lights off\n");
+	printf("\trpilights weather\tDisplay scrolling time, date, weather\n");
 	printf("\trpilights red\t\tSet all lights to red\n");
 	printf("\trpilights blue\t\tSet all lights to blue\n");
 	printf("\trpilights green\t\tSet all lights to green\n");

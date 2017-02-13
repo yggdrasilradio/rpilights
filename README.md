@@ -39,12 +39,13 @@ to reflect the physical layout of your LED display.
 
 The "snow" animation vertically scrolls the graphic data in the file images/snow.gif.rgb.
 
-The "hearts" animation horizontally scrolls the graphic data in the file images/hearts.gif.rgb.
+The "valentines" animation horizontally scrolls the graphic data in the file images/valentines.gif.rgb.
 
-The hearts.gif.rgb and snow.gif.rgb files are generated from the script gif2rgb via the commands:
+The valentines.gif.rgb and snow.gif.rgb files are generated from the script gif2rgb (requires installation
+of ImageMagick) via the commands:
 
-	gif2rgb hearts.gif
 	gif2rgb snow.gif
+	gif2rgb valentines.gif
 
 Make your own files with the dimensions of your display, as the existing data probably doesn't match those dimensions.
 
@@ -88,8 +89,9 @@ the examples, etc.
 
 The "rpilights" command by itself with no further arguments should give a list of possible commands:
 
-	rpilights on		Display scrolling time, date, weather
+	rpilights on		Tun lights on (show last animation)
 	rpilights off		Turn lights off
+	rpilights weather	Display scrolling time, date, weather
 	rpilights red		Set all lights to red
 	rpilights blue		Set all lights to blue
 	rpilights green		Set all lights to green
@@ -101,7 +103,7 @@ The "rpilights" command by itself with no further arguments should give a list o
 	rpilights pacman	Display Pacman animation
 	rpilights snow		Display snow animation
 	rpilights lines		Display lines animation
-	rpilights hearts	Display scrolling hearts animation
+	rpilights valentines	Display scrolling Valentine's Day animation
 
 ### rc.local
 
