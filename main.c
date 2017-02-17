@@ -983,7 +983,7 @@ void ReadMap() {
 
 
 		// Get LED display width, height, max line size
-		k = CharCount(words[i], 'o') + CharCount(words[i], '.');
+		k = CharCount(words[i], 'o') + CharCount(words[i], '.') + CharCount(words[i], '0') + CharCount(words[i], '1');
 		if (k > width)
 			width = k;
 		if (k > 0)
@@ -1022,7 +1022,7 @@ void ReadMap() {
 	xcurr = xchannel0;
 	ycurr = ychannel0;
 	k = 0;
-	while (TRUE) {
+	while (xcurr >= 0 && ycurr >= 0) {
 		ccurr = words[ycurr][xcurr];
 		words[ycurr][xcurr] = ' ';
 		if (ccurr == 'o' || ccurr == '0' || ccurr == '1') {
@@ -1054,7 +1054,7 @@ void ReadMap() {
 	xcurr = xchannel1;
 	ycurr = ychannel1;
 	k = 0;
-	while (TRUE) {
+	while (xcurr >= 0 && ycurr >= 0) {
 		ccurr = words[ycurr][xcurr];
 		words[ycurr][xcurr] = ' ';
 		if (ccurr == 'o' || ccurr == '0' || ccurr == '1') {
@@ -1081,7 +1081,6 @@ void ReadMap() {
 		ledstring.channel[1].brightness = INT;
 		ledstring.channel[1].count = k;
 	}
-
 }
 
 void GetGIFDimensions(uint8_t *filename, int32_t *width, int32_t *height) {
