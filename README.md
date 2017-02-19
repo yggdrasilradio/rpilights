@@ -5,9 +5,6 @@ rpilights
 
 Software for LED window display such as the one in [this video](https://www.youtube.com/watch?v=n9-j6oeJJw4).
 
-### Downloading
-
-
 ### Hardware
 
 Lights [here](https://www.amazon.com/dp/B00QK8QE1A).  This link may be outdated at some point as the vendor likes to play
