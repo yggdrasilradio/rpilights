@@ -5,6 +5,9 @@ rpilights
 
 Software for LED window display such as the one in [this video](https://www.youtube.com/watch?v=n9-j6oeJJw4).
 
+### Downloading
+
+
 ### Hardware
 
 Lights [here](https://www.amazon.com/dp/B00QK8QE1A).  This link may be outdated at some point as the vendor likes to play
@@ -32,7 +35,13 @@ from the wires that are to receive the signal.
 
 ### Software
 
-Put all the files into the directory /home/pi/rpilights
+Install into the directory /home/pi/rpilights:
+
+	sudo apt-get update
+	sudo apt-get install git
+	sudo apt-get install imagemagick
+	cd /home/pi
+	git clone --recursive git://github.com/yggdrasilradio/rpilights.git
 
 The command "make" should build the "rpilights" command, but it won't work properly until you configure the map.txt file
 to reflect the physical layout of your LED display.

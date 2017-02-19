@@ -1387,6 +1387,13 @@ int main(int argc, char *argv[]) {
 
 	if (argc == 2) {
 
+		// RPILIGHTS MAP
+		if (strcmp(argv[1], "map") == 0) {
+			printf("width %d, height %d, channel 0 %d lights, channel 1 %d lights.\n", width, height, 
+				ledstring.channel[0].count, ledstring.channel[1].count);
+			exit(0);
+		}
+		
 		// RPILIGHTS OFF
 		if (strcmp(argv[1], "off") == 0) {
 			SetAllLights(BLACK);
