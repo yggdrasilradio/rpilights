@@ -905,10 +905,6 @@ void DrawCircle(uint32_t x0, uint32_t y0, uint32_t size, uint32_t color) {
 static void kill_handler(uint32_t signum) {
 
 	ws2811_fini(&ledstring);
-	ws2811_init(&ledstring);
-	clearScreen();
-	ws2811_render(&ledstring);
-	ws2811_fini(&ledstring);
 }
 
 static void setup_handlers(void) {
