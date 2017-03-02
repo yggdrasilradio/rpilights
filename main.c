@@ -1218,6 +1218,8 @@ void StopService() {
 		unlink(PIDFILE);
 		kill(mypid, SIGUSR1);
 		Delay();
+		Delay();
+		Delay();
 	}
 }
 
