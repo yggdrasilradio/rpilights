@@ -26,6 +26,7 @@
 #define HOLIDAYS "/home/pi/rpilights/.holidays"	// Location of holiday definitions file
 #define TEMPERATURE "/dev/shm/.temperature"	// Location of temperature file
 #define FORECAST "/dev/shm/.forecast"		// Location of weather forecast file
+#define WARNING "/dev/shm/.warning"		// Location of weather warning file
 #define MAP "/home/pi/rpilights/map.txt"	// Location of LED map file
 #define COMMAND "/home/pi/rpilights/.command"	// Location of previous animation file
 
@@ -647,9 +648,22 @@ void TimeDateWeather () {
 						strcpy(sTemperature, s);
 				}
 
+
+
 				// Forecast
 				s[0]= '\0';
 				fp = fopen(FORECAST, "r");
+				if (fp != NULL) {
+					fgets(s, sizeof(s) - 1, fp);
+					fclose(fp);
+					s[strlen(s) - 1] = '\0';
+					if (strlen(s) > 0)
+						strcpy(sForecast, s);
+				}
+
+				// Warning: supercedes Forecast
+				s[0]= '\0';
+				fp = fopen(WARNING, "r");
 				if (fp != NULL) {
 					fgets(s, sizeof(s) - 1, fp);
 					fclose(fp);
@@ -1292,6 +1306,27 @@ void ShowIP() {
 		ScrollString(s, Colors(rand() % 1536));
 }
 
+void StPatricksDay() {
+
+	uint32_t slice[height];
+	int32_t x, y, xwidth, yheight;
+
+	ws2811_init(&ledstring);
+	GetGIFDimensions("/home/pi/rpilights/images/stpatricksday.gif.rgb", &xwidth, &yheight);
+	RenderFile("/home/pi/rpilights/images/stpatricksday.gif.rgb");
+	Render();
+	x = width;
+	while (TRUE) {
+		Delay();
+		scrollLeft();
+		RenderSlice("/home/pi/rpilights/images/stpatricksday.gif.rgb", x, slice);
+		for (y = 0; y < height; y++)
+			setPixel(width - 1, y, slice[y]);
+		x = ++x % xwidth;
+		Render();
+	}
+}
+
 void Valentines() {
 
 	uint32_t slice[height];
@@ -1469,6 +1504,10 @@ int main(int argc, char *argv[]) {
 		// RPILIGHTS VALENTINES
 		if (strcmp(command, "valentines") == 0)
 			StartService(Valentines);
+
+		// RPILIGHTS STPATRICKS
+		if (strcmp(command, "stpatricks") == 0)
+			StartService(StPatricksDay);
 	}
 
 	// USAGE
@@ -1487,5 +1526,6 @@ int main(int argc, char *argv[]) {
 	printf("\trpilights pacman\tDisplay Pacman animation\n");
 	printf("\trpilights snow\t\tDisplay snow animation\n");
 	printf("\trpilights valentines\tDisplay Valentine's Day animation\n");
+	printf("\trpilights stpatricks\tDisplay St Patrick\'s Day animation\n");
 	exit(0);
 }

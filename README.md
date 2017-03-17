@@ -47,7 +47,9 @@ The "snow" animation vertically scrolls the graphic data in the file images/snow
 
 The "valentines" animation horizontally scrolls the graphic data in the file images/valentines.gif.rgb.
 
-The valentines.gif.rgb and snow.gif.rgb files are generated from the script gif2rgb (requires installation
+The "stpatricks" animation horizontally scrolls the graphic data in the file images/stpatricksday.gif.rgb.
+
+The .rgb files are generated from the script gif2rgb (requires installation
 of ImageMagick) via the commands:
 
 	gif2rgb snow.gif
@@ -110,6 +112,7 @@ The "rpilights" command by itself with no further arguments should give a list o
 	rpilights snow			Display snow animation
 	rpilights lines			Display lines animation
 	rpilights valentines	Display scrolling Valentine's Day animation
+	rpilights stpatricks	Display scrolling St Patrick's Day animation
 
 ### rc.local
 
