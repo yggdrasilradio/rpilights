@@ -21,7 +21,7 @@
 #define GPIO_PIN0 18
 #define GPIO_PIN1 19
 #define DMA 5
-#define PIDFILE "/var/run/lights.pid"
+#define PIDFILE "/var/run/rpilights.pid"
 
 #define HOLIDAYS "/home/pi/rpilights/.holidays"	// Location of holiday definitions file
 #define TEMPERATURE "/dev/shm/.temperature"	// Location of temperature file

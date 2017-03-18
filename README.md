@@ -54,6 +54,7 @@ of ImageMagick) via the commands:
 
 	gif2rgb snow.gif
 	gif2rgb valentines.gif
+	gif2rgb stpatricksday.gif
 
 Make your own files with the dimensions of your display, as the existing data probably doesn't match those dimensions.
 
