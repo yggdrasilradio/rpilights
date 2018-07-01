@@ -1,10 +1,15 @@
 #!/bin/csh
 
-cd /home/pi/rpilights
+cd /dev/shm
 loop:
-wget --quiet http://www.wunderground.com/cgi-bin/findweather/getForecast\?query=55337 > /dev/null
-fgrep \"temperature\": getForecast* | cut -d: -f2 | sed 's/[",]//g'| xargs > /dev/shm/.temperature
-fgrep \"condition\": getForecast* | cut -d: -f2 | sed 's/[",]//g' | xargs > /dev/shm/.forecast
-rm -f getForecast*
+rm -f .wxdata
+curl -s "https://api.openweathermap.org/data/2.5/weather?APPID=c182fa7830ca919362fefde7d5ff13f9&zip=55337,us&units=imperial" > .wxdata
+set result = `jq -r '.cod' < .wxdata`
+if ($result == 200) then
+	set result = `jq -r '.main.temp' < .wxdata`
+	/usr/bin/printf '%.0f\n' $result > .temperature
+	set result = `jq -r '.weather | map (.main) | join (", ")' < .wxdata`
+	echo $result > .forecast
+endif
 sleep 300
 goto loop

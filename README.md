@@ -98,22 +98,24 @@ the examples, etc.
 
 The "rpilights" command by itself with no further arguments should give a list of possible commands:
 
-	rpilights on			Turn lights on (show last animation)
-	rpilights off			Turn lights off
-	rpilights weather		Display scrolling time, date, weather
-	rpilights red			Set all lights to red
-	rpilights blue			Set all lights to blue
-	rpilights green			Set all lights to green
-	rpilights magenta		Set all lights to magenta
-	rpilights yellow		Set all lights to yellow
-	rpilights cyan			Set all lights to cyan
-	rpilights rainbow		Display scrolling rainbow pattern
-	rpilights ip			Display scrolling IP address
-	rpilights pacman		Display Pacman animation
-	rpilights snow			Display snow animation
-	rpilights lines			Display lines animation
-	rpilights valentines		Display scrolling Valentine's Day animation
-	rpilights stpatricks		Display scrolling St Patrick's Day animation
+	Usage:	rpilights on		Turn lights on (show last animation)
+		rpilights off		Turn lights off
+		rpilights weather	Display scrolling time, date, weather
+		rpilights red		Set all lights to red
+		rpilights blue		Set all lights to blue
+		rpilights green		Set all lights to green
+		rpilights magenta	Set all lights to magenta
+		rpilights yellow	Set all lights to yellow
+		rpilights cyan		Set all lights to cyan
+		rpilights rainbow	Display scrolling rainbow pattern
+		rpilights ip		Display scrolling IP address
+		rpilights pacman	Display Pacman animation
+		rpilights snow		Display snow animation
+		rpilights lines		Display random lines animation
+		rpilights twinkle	Display twinkle lights animation
+		rpilights valentines	Display Valentine's Day animation
+		rpilights stpatricks	Display St Patrick's Day animation
+		rpilights christmas	Display Christmas animation
 
 ### rc.local
 
@@ -122,5 +124,5 @@ The file misc/rc.local has suggested commands to add to your existing /etc/rc.lo
 ### updatewx script
 
 Edit the file scripts/updatewx to put your zipcode in place of mine (55337).
-This script gets weather info (forecast, temperature and humidity) every five minutes.
+This script gets weather info (forecast and temperature) every five minutes.
 You'll want to start this script from rc.local.  If you don't run this, the 'weather' command won't work.

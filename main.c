@@ -122,7 +122,8 @@ static const uint8_t font5x5[] = {
 	0x00,0x00,0x00,0x00,0x40, // .
 	0x40,0x40,0x40,0x00,0x40, // !
 	0x20,0x50,0x20,0x00,0x40, // (degree)
-	0x28,0x7c,0x28,0x7c,0x28  // #
+	0x28,0x7c,0x28,0x7c,0x28, // #
+	0x04,0x08,0x10,0x20,0x40  // /
 };
 
 // 5x8 font
@@ -324,7 +325,7 @@ uint32_t Draw5x5Char(uint8_t c, uint32_t x, uint32_t y, uint32_t color) {
 	uint8_t *p1, *p2, *p;
 	uint32_t n = 0;
 	uint32_t i, j, mask;
-	uint8_t s[] = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:,.!`#";
+	uint8_t s[] = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:,.!`#/";
 
 	// If it's a space, advance 2 pixels
 	if (c == ' ')
@@ -568,7 +569,7 @@ void TimeDateWeather () {
 	FILE *fp;
 	uint8_t s0[2046], s1[2046], s2[2046];
 	uint8_t sTemperature[2046], sForecast[2046];
-	uint8_t sDate[2046], s[2046];
+	uint8_t sDate[2046], s[2046], *p;
 	struct {
 		uint32_t fonttype;
 		uint32_t pos;
@@ -631,7 +632,7 @@ void TimeDateWeather () {
 				arr[i].s[0] = '\0';
 				arr[i].fonttype = 1;
 				arr[i].pos = 1;
-				arr[i].color = RGB(255, 255, 255);
+				arr[i].color = WHITE;
 
 				// Temperature
 				s[0]= '\0';
@@ -640,15 +641,14 @@ void TimeDateWeather () {
 					fgets(s, sizeof(s) - 1, fp);
 					fclose(fp);
 					s[strlen(s) - 1] = '\0';
-					if (strstr(s, ".0") != NULL)
-						s[strlen(s) - 2] = '\0';
-					if (strlen(s) > 0)
+					p = strstr(s, ".");
+					if (p != NULL)
+						*p = '\0';
+					if (strlen(s) > 0 && strstr(s, "null") == NULL) {
 						strcat(s, "`F");
-					if (strlen(s) > 0)
 						strcpy(sTemperature, s);
+					}
 				}
-
-
 
 				// Forecast
 				s[0]= '\0';
@@ -691,7 +691,7 @@ void TimeDateWeather () {
 				arr[i].s[0] = '\0';
 				arr[i].fonttype = 2;
 				arr[i].pos = 1;
-				arr[i].color = RGB(0, 255, 0);
+				arr[i].color = GREEN;
 
 				// date
 				fp = popen("date +'%a, %b %-d, %Y'", "r"); 
@@ -741,7 +741,7 @@ void TimeDateWeather () {
 							break;
 						s[strlen(s) - 1] = '\0';
 						DrawShapes(70);
-						ScrollString(s, RGB(255, 255, 255));
+						ScrollString(s, WHITE);
 						DrawShapes(70);
 						break;
 					}
@@ -1327,6 +1327,27 @@ void StPatricksDay() {
 	}
 }
 
+void Christmas() {
+
+	uint32_t slice[height];
+	int32_t x, y, xwidth, yheight;
+
+	ws2811_init(&ledstring);
+	GetGIFDimensions("/home/pi/rpilights/images/christmas.gif.rgb", &xwidth, &yheight);
+	RenderFile("/home/pi/rpilights/images/christmas.gif.rgb");
+	Render();
+	x = width;
+	while (TRUE) {
+		Delay();
+		scrollLeft();
+		RenderSlice("/home/pi/rpilights/images/christmas.gif.rgb", x, slice);
+		for (y = 0; y < height; y++)
+			setPixel(width - 1, y, slice[y]);
+		x = ++x % xwidth;
+		Render();
+	}
+}
+
 void Valentines() {
 
 	uint32_t slice[height];
@@ -1361,9 +1382,33 @@ void Snow() {
 	}
 }
 
+void Twinkle() {
+
+	int32_t x0, y0, i;
+	uint32_t color;
+
+	ws2811_init(&ledstring);
+	setScreen(BLACK);
+	Render();
+	while (TRUE) {
+		fadeScreen(0.97);
+		for (i = 0; i < 4; i++) {
+			color = Colors(rand() % 1536);
+			x0 = rand() % width;
+			y0 = rand() % height;
+			setPixel(x0, y0, color);
+		}
+		Render();
+	}
+}
+
 void Pacman() {
 
-	int32_t i, y, k = width;
+	int32_t i, y, k;
+	int32_t xwidth, yheight;
+
+	GetGIFDimensions("/home/pi/rpilights/images/pacman1.gif.rgb", &xwidth, &yheight);
+	k = xwidth;
 
 	ws2811_init(&ledstring);
 	y = floor((height - 10) / 2);
@@ -1380,7 +1425,7 @@ void Pacman() {
 		}
 		Render();
 
-		for (i = k; i > -k; i--) {
+		for (i = width; i > -xwidth; i--) {
 			if (i & 1)
 				RenderSprite("/home/pi/rpilights/images/pacman1.gif.rgb", i, y);
 			else
@@ -1399,7 +1444,7 @@ void Pacman() {
 		}
 		Render();
 
-		for (i = -k; i < k; i++) {
+		for (i = -xwidth; i < width; i++) {
 			if (i & 1)
 				RenderSprite("/home/pi/rpilights/images/pacman3.gif.rgb", i, y);
 			else
@@ -1497,6 +1542,10 @@ int main(int argc, char *argv[]) {
 		if (strcmp(command, "snow") == 0)
 			StartService(Snow);
 
+		// RPILIGHTS TWINKLE
+		if (strcmp(command, "twinkle") == 0)
+			StartService(Twinkle);
+
 		// RPILIGHTS LINES
 		if (strcmp(command, "lines") == 0)
 			StartService(Lines);
@@ -1508,6 +1557,10 @@ int main(int argc, char *argv[]) {
 		// RPILIGHTS STPATRICKS
 		if (strcmp(command, "stpatricks") == 0)
 			StartService(StPatricksDay);
+
+		// RPILIGHTS CHRISTMAS
+		if (strcmp(command, "christmas") == 0)
+			StartService(Christmas);
 	}
 
 	// USAGE
@@ -1525,7 +1578,10 @@ int main(int argc, char *argv[]) {
 	printf("\trpilights ip\t\tDisplay scrolling IP address\n");
 	printf("\trpilights pacman\tDisplay Pacman animation\n");
 	printf("\trpilights snow\t\tDisplay snow animation\n");
+	printf("\trpilights lines\t\tDisplay random lines animation\n");
+	printf("\trpilights twinkle\tDisplay twinkle lights animation\n");
 	printf("\trpilights valentines\tDisplay Valentine's Day animation\n");
 	printf("\trpilights stpatricks\tDisplay St Patrick\'s Day animation\n");
+	printf("\trpilights christmas\tDisplay Christmas animation\n");
 	exit(0);
 }
