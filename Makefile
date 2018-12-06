@@ -1,5 +1,5 @@
 HEADERS=rpi_ws281x/clk.h rpi_ws281x/dma.h rpi_ws281x/gpio.h rpi_ws281x/pwm.h rpi_ws281x/ws2811.h rpi_ws281x/mailbox.h rpi_ws281x/rpihw.h
-OBJ=main.o rpi_ws281x/dma.o rpi_ws281x/pwm.o rpi_ws281x/ws2811.o rpi_ws281x/mailbox.o rpi_ws281x/rpihw.o
+OBJ=main.o rpi_ws281x/dma.o rpi_ws281x/pwm.o rpi_ws281x/ws2811.o rpi_ws281x/mailbox.o rpihw.o
 TARGET=/usr/local/bin/rpilights
 CFLAGS=-O -w -fstack-protector -lm
 
