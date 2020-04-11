@@ -121,6 +121,12 @@ The "rpilights" command by itself with no further arguments should give a list o
 
 The file misc/rc.local has suggested commands to add to your existing /etc/rc.local file.
 
+### /dev/shm/.messages5x8 and /dev/shm/.messages5x5
+
+If these files exist, messages from .messages5x8 will scroll as well as the temperature and weather in the upper line
+of the weather display, and messages from .messages5x5 will scroll along with the date and time in the lower line.  If
+there are multiple lines in the file each line will display in turn.
+
 ### updatewx script
 
 Edit the file scripts/updatewx to put your zipcode in place of mine (55337).
