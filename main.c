@@ -20,13 +20,14 @@
 #define TARGET_FREQ WS2811_TARGET_FREQ
 #define GPIO_PIN0 18
 #define GPIO_PIN1 19
-#define DMA 5
+#define DMA 10
 #define PIDFILE "/var/run/rpilights.pid"
 
 #define HOLIDAYS "/home/pi/rpilights/.holidays"	// Location of holiday definitions file
 #define TEMPERATURE "/dev/shm/.temperature"	// Location of temperature file
 #define FORECAST "/dev/shm/.forecast"		// Location of weather forecast file
-#define WARNING "/dev/shm/.warning"		// Location of weather warning file
+#define MESSAGES5x8 "/dev/shm/.messages5x8"	// Location of messages file
+#define MESSAGES5x5 "/dev/shm/.messages5x5"	// Location of messages file 2
 #define MAP "/home/pi/rpilights/map.txt"	// Location of LED map file
 #define COMMAND "/home/pi/rpilights/.command"	// Location of previous animation file
 
@@ -567,19 +568,23 @@ void TimeDateWeather () {
 	uint32_t i0 = 0, i1 = 0, count;
 	int32_t idur, i, j, y5x8, y5x5;
 	FILE *fp;
-	uint8_t s0[2046], s1[2046], s2[2046];
-	uint8_t sTemperature[2046], sForecast[2046];
-	uint8_t sDate[2046], s[2046], *p;
+	uint8_t s0[500], s1[500], s2[500];
+	uint8_t sTemperature[500], sForecast[500];
+	uint8_t sDate[500], s[500], *p;
 	struct {
 		uint32_t fonttype;
 		uint32_t pos;
 		uint8_t s[300];
 		uint32_t color;
-	} arr[10];
+	} arr[5];
 	uint8_t temp[10];
+	uint8_t n5x8, n5x5, i5x8, i5x5;
+	char lines5x8[10][128];
+	char lines5x5[10][128];
 
 	itime = 0;
 	uint32_t bgcolor = BLACK;
+
 
 	s[0] = '\0';
 	s0[0] = '\0';
@@ -588,6 +593,31 @@ void TimeDateWeather () {
 	sTemperature[0] = '\0';
 	sForecast[0] = '\0';
 
+	// Read messages for 5x8 text
+	n5x8 = 0;
+	i5x8 = 0;
+	fp = fopen(MESSAGES5x8, "r");
+	if (fp != NULL) {
+		while(fgets(lines5x8[n5x8], 128, fp)) {
+			lines5x8[n5x8][strlen(lines5x8[n5x8]) - 1] = '\0';
+			n5x8++;
+		}
+		fclose(fp);
+	}
+
+	// Read messages for 5x5 text
+	n5x5 = 0;
+	i5x5 = 0;
+	fp = fopen(MESSAGES5x5, "r");
+	if (fp != NULL) {
+		while(fgets(lines5x5[n5x5], 128, fp)) {
+			lines5x5[n5x5][strlen(lines5x5[n5x5]) - 1] = '\0';
+			n5x5++;
+		}
+		fclose(fp);
+	}
+
+	// Clear text render queue
 	for (i = 0; i < (sizeof(arr) / sizeof(arr[0])); i++) {
 		arr[i].fonttype = 0;
 		arr[i].pos = 0;
@@ -661,20 +691,17 @@ void TimeDateWeather () {
 						strcpy(sForecast, s);
 				}
 
-				// Warning: supercedes Forecast
-				s[0]= '\0';
-				fp = fopen(WARNING, "r");
-				if (fp != NULL) {
-					fgets(s, sizeof(s) - 1, fp);
-					fclose(fp);
-					s[strlen(s) - 1] = '\0';
-					if (strlen(s) > 0)
-						strcpy(sForecast, s);
-				}
-
 				strcat(arr[i].s, sTemperature);
 				strcat(arr[i].s, "   ");
 				strcat(arr[i].s, sForecast);
+
+				// Messages: appended to forecast
+				if (n5x8 > 0) {
+					if (i5x8 >= n5x8) i5x8 = 0;
+					strcat(arr[i].s, "   ");
+					strcat(arr[i].s, lines5x8[i5x8++]);
+				}
+
 			}
 
 			// Need to generate new 5x5 string?
@@ -693,7 +720,7 @@ void TimeDateWeather () {
 				arr[i].pos = 1;
 				arr[i].color = GREEN;
 
-				// date
+				// Date
 				fp = popen("date +'%a, %b %-d, %Y'", "r"); 
 				if (fp != NULL) {
 					fgets(s0, sizeof(s0) - 1, fp);
@@ -703,7 +730,7 @@ void TimeDateWeather () {
 					strcat(arr[i].s, "   ");
 				}
 
-				// time
+				// Time
 				fp = popen("date +'%-I:%M %P'", "r"); 
 				if (fp != NULL) {
 					fgets(s0, sizeof(s0) - 1, fp);
@@ -711,13 +738,21 @@ void TimeDateWeather () {
 					s0[strlen(s0) - 1] = '\0';
 					strcat(arr[i].s, s0);
 				}
+
+				// Messages: appended to date/time
+				if (n5x5 > 0) {
+					if (i5x5 >= n5x5) i5x5 = 0;
+					strcat(arr[i].s, "   ");
+					strcat(arr[i].s, lines5x5[i5x5++]);
+				}
+
 			}
 
 			Render();
 			Delay();
 		}
 
-		// holidays
+		// Holidays
 		sDate[0] = '\0';
 		fp = popen("date +'%a, %b %-d, %Y'", "r"); 
 		if (fp != NULL) {
