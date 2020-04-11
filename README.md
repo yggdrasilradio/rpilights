@@ -7,9 +7,21 @@ Software for LED window display such as the one in [this video](https://www.yout
 
 ### Hardware
 
-Lights [here](https://www.amazon.com/Diffused-Digital.../dp/B00B4UKG2W).  This link may be outdated at some point as the vendor likes to play
-Feng Shui with his listings.  Also, be aware that the delivery times can sometimes be very long, like several months,
+Lights [here](https://www.amazon.com/Diffused-Digital.../dp/B00B4UKG2W).  This link may be
+outdated at some point as the vendor likes to play
+Feng Shui with his listings.  Also, be aware that the delivery times might sometimes be very long, like several months,
 so plan ahead!
+
+If the link is outdated (likely), look for these keywords: 
+
+* WS2811
+* 12mm
+* Diffused
+* RGB
+* LED
+* Round
+* IP68
+* DC 5V
 
 Either mount in pegboard (holes every 2 inches drilled out to 12mm) or in 1/2 inch grid hardware cloth.
 
