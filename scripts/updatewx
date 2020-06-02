@@ -3,7 +3,7 @@
 cd /dev/shm
 loop:
 rm -f .wxdata
-curl -s "https://api.openweathermap.org/data/2.5/weather?APPID=c182fa7830ca919362fefde7d5ff13f9&zip=55337,us&units=imperial" > .wxdata
+curl -s -k "https://api.openweathermap.org/data/2.5/weather?APPID=c182fa7830ca919362fefde7d5ff13f9&zip=55337,us&units=imperial" > .wxdata
 set result = `jq -r '.cod' < .wxdata`
 if ($result == 200) then
 	set result = `jq -r '.main.temp' < .wxdata`

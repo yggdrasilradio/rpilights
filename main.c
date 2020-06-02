@@ -17,21 +17,24 @@
 #define TRUE 1
 #define FALSE 0
 
+#define FONT5X8 1
+#define FONT5X5 2
+
 #define TARGET_FREQ WS2811_TARGET_FREQ
 #define GPIO_PIN0 18
 #define GPIO_PIN1 19
 #define DMA 10
 #define PIDFILE "/var/run/rpilights.pid"
 
-#define HOLIDAYS "/home/pi/rpilights/.holidays"	// Location of holiday definitions file
-#define TEMPERATURE "/dev/shm/.temperature"	// Location of temperature file
-#define FORECAST "/dev/shm/.forecast"		// Location of weather forecast file
-#define MESSAGES5x8 "/dev/shm/.messages5x8"	// Location of messages file
-#define MESSAGES5x5 "/dev/shm/.messages5x5"	// Location of messages file 2
-#define MAP "/home/pi/rpilights/map.txt"	// Location of LED map file
-#define COMMAND "/home/pi/rpilights/.command"	// Location of previous animation file
+#define HOLIDAYS "/home/pi/rpilights/.holidays"		// Location of holiday definitions file
+#define TEMPERATURE "/dev/shm/.temperature"		// Location of temperature file
+#define FORECAST "/dev/shm/.forecast"			// Location of weather forecast file
+#define MESSAGES5x8 "/home/pi/rpilights/.messages5x8"	// Location of messages for 1st line of display
+#define MESSAGES5x5 "/home/pi/rpilights/.messages5x5"	// Location of messages for 2nd line of display
+#define MAP "/home/pi/rpilights/map.txt"		// Location of LED map file
+#define COMMAND "/home/pi/rpilights/.command"		// Location of previous animation file
 
-#define INT 50		// LED intensity (0 to 255) normally 50
+#define INT 50						// LED intensity (0 to 255) normally 50
 
 #define RED RGB(255, 0, 0)
 #define DARKRED RGB(128, 0, 0)
@@ -54,6 +57,8 @@
 
 int16_t width = 0;
 int16_t height = 0;
+int16_t nline1 = 0;
+int16_t nline2 = 0;
 int16_t *ledmap = NULL;
 uint32_t *ledvalues = NULL;
 uint8_t command[128];
@@ -122,9 +127,13 @@ static const uint8_t font5x5[] = {
 	0x00,0x00,0x00,0x20,0x40, // ,
 	0x00,0x00,0x00,0x00,0x40, // .
 	0x40,0x40,0x40,0x00,0x40, // !
-	0x20,0x50,0x20,0x00,0x40, // (degree)
+	0x20,0x50,0x20,0x00,0x40, // ` (degree)
 	0x28,0x7c,0x28,0x7c,0x28, // #
-	0x04,0x08,0x10,0x20,0x40  // /
+	0x04,0x08,0x10,0x20,0x40, // /
+	0x30,0x48,0x10,0x00,0x10, // ?
+	0x20,0x20,0x00,0x00,0x00, // '
+	0x28,0x28,0x00,0x00,0x00, // "
+	0x28,0x7c,0x7c,0x38,0x10  // ^ (heart)
 };
 
 // 5x8 font
@@ -326,11 +335,16 @@ uint32_t Draw5x5Char(uint8_t c, uint32_t x, uint32_t y, uint32_t color) {
 	uint8_t *p1, *p2, *p;
 	uint32_t n = 0;
 	uint32_t i, j, mask;
-	uint8_t s[] = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:,.!`#/";
+	uint8_t s[] = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:,.!`#/?'\"^";
+	uint32_t ccolor;
 
 	// If it's a space, advance 2 pixels
 	if (c == ' ')
 		return(2);
+
+	ccolor = color;
+	if (c == '^')
+		ccolor = RED;	// force red color for hearts
 
 	p = font5x5;
 	for (i = 0; i < strlen(s) && s[i] != toupper(c); i++)
@@ -342,7 +356,7 @@ uint32_t Draw5x5Char(uint8_t c, uint32_t x, uint32_t y, uint32_t color) {
 			mask = 0x40;
 			for (j = 0; j < 5; j++) {
 				if ((p[i] & mask) != 0) {
-					setPixel(x + j, y + i, color);
+					setPixel(x + j, y + i, ccolor);
 					if (j > n)
 						n = j;
 				}
@@ -355,9 +369,14 @@ uint32_t Draw5x5Char(uint8_t c, uint32_t x, uint32_t y, uint32_t color) {
 	return(n + 1);
 }
 
-void Draw5x5String(uint8_t *p, uint32_t x, uint32_t y, uint32_t color) {
+void Draw5x5String(uint8_t *p, uint32_t x, uint32_t y) {
+
+	uint32_t i = 0;
+	uint32_t color = GREEN;
 
 	while (*p != '\0') {
+		if (i++ > 30)
+			color = YELLOW;
 		if (*p == ',') // give comma a descender
 			x += (Draw5x5Char(*p, x, y + 1, color) + 1);
 		else
@@ -404,9 +423,14 @@ uint32_t Draw5x8Char(uint8_t c, uint32_t x, uint32_t y, uint32_t color) {
 	return(n);
 }
 
-void Draw5x8String(uint8_t *p, uint32_t x, uint32_t y, uint32_t color) {
+void Draw5x8String(uint8_t *p, uint32_t x, uint32_t y) {
+
+	uint32_t i = 0;
+	uint32_t color = WHITE;
 
 	while (*p != '\0') {
+		//if (i++ > 30)
+		//	color = CYAN;
 		x += (Draw5x8Char(*p, x, y, color) + 1);
 		*p++;
 	}
@@ -463,7 +487,7 @@ void ScrollString(uint8_t *s, uint32_t color) {
 			setPixel((j + itime) % width, y + 9, bcolor);
 		}
 
-		Draw5x8String(s, width - i, y + 1, color);
+		Draw5x8String(s, width - i, y + 1);
 		itime++;
 
 		Render();
@@ -471,17 +495,14 @@ void ScrollString(uint8_t *s, uint32_t color) {
 	}
 }
 
-uint8_t Do5x8String(uint8_t *s, uint32_t color, uint32_t *i, int32_t y) {
+uint8_t Do5x8String(uint8_t *s, uint32_t *i, int32_t y) {
 
-	uint32_t j;
-	uint32_t bcolor;
-	uint32_t k = width;
 	int32_t n = strlen(s) - 1;
 
 	if (n <= 0)
 		return(TRUE);
 
-	Draw5x8String(s, width - *i, y, color);
+	Draw5x8String(s, width - *i, y);
 	itime++;
 	(*i)++;
 	if (*i < (width + (n * 6) + 5))
@@ -490,15 +511,13 @@ uint8_t Do5x8String(uint8_t *s, uint32_t color, uint32_t *i, int32_t y) {
 		return(TRUE);
 }
 
-uint8_t Do5x5String(uint8_t *s, uint32_t color, uint32_t *i, int32_t y) {
+uint8_t Do5x5String(uint8_t *s, uint32_t *i, int32_t y) {
 
-	uint32_t j, bcolor;
-	uint32_t k = width;
 	int32_t n = strlen(s) - 1;
 
 	if (n <= 0)
 		return(TRUE);
-	Draw5x5String(s, width - *i, y, color);
+	Draw5x5String(s, width - *i, y);
 	itime++;
 	(*i)++;
 	if (*i < (width + (n * 6) + 5))
@@ -575,12 +594,12 @@ void TimeDateWeather () {
 		uint32_t fonttype;
 		uint32_t pos;
 		uint8_t s[300];
-		uint32_t color;
-	} arr[5];
+		uint8_t s2[300];
+	} arr[10];
 	uint8_t temp[10];
 	uint8_t n5x8, n5x5, i5x8, i5x5;
-	char lines5x8[10][128];
-	char lines5x5[10][128];
+	char lines5x8[20][128];
+	char lines5x5[20][128];
 
 	itime = 0;
 	uint32_t bgcolor = BLACK;
@@ -593,9 +612,11 @@ void TimeDateWeather () {
 	sTemperature[0] = '\0';
 	sForecast[0] = '\0';
 
+	i5x8 = 0;
+	i5x5 = 0;
+
 	// Read messages for 5x8 text
 	n5x8 = 0;
-	i5x8 = 0;
 	fp = fopen(MESSAGES5x8, "r");
 	if (fp != NULL) {
 		while(fgets(lines5x8[n5x8], 128, fp)) {
@@ -607,7 +628,6 @@ void TimeDateWeather () {
 
 	// Read messages for 5x5 text
 	n5x5 = 0;
-	i5x5 = 0;
 	fp = fopen(MESSAGES5x5, "r");
 	if (fp != NULL) {
 		while(fgets(lines5x5[n5x5], 128, fp)) {
@@ -622,7 +642,7 @@ void TimeDateWeather () {
 		arr[i].fonttype = 0;
 		arr[i].pos = 0;
 		arr[i].s[0] = '\0';
-		arr[i].color = 0;
+		arr[i].s2[0] = '\0';
 	}
 
 	y5x8 = floor((height - 13) / 2);
@@ -639,12 +659,15 @@ void TimeDateWeather () {
 
 			// Render strings
 			for (i = 0; i < (sizeof(arr) / sizeof(arr[0])); i++) {
-				if (arr[i].fonttype == 1) 
-					if (Do5x8String(arr[i].s, arr[i].color, &arr[i].pos, y5x8))
+
+				// Render 5x8 strings
+				if (arr[i].fonttype == FONT5X8) 
+					if (Do5x8String(arr[i].s, &arr[i].pos, y5x8))
 						arr[i].fonttype = 0;
 
-				if (arr[i].fonttype == 2) 
-					if (Do5x5String(arr[i].s, arr[i].color, &arr[i].pos, y5x5))
+				// Render 5x5 strings
+				if (arr[i].fonttype == FONT5X5) 
+					if (Do5x5String(arr[i].s, &arr[i].pos, y5x5))
 						arr[i].fonttype = 0;
 			}
 
@@ -660,9 +683,9 @@ void TimeDateWeather () {
 				for (i = 0; arr[i].fonttype != 0; i++);
 				
 				arr[i].s[0] = '\0';
-				arr[i].fonttype = 1;
+				arr[i].s2[0] = '\0';
+				arr[i].fonttype = FONT5X8;
 				arr[i].pos = 1;
-				arr[i].color = WHITE;
 
 				// Temperature
 				s[0]= '\0';
@@ -696,11 +719,11 @@ void TimeDateWeather () {
 				strcat(arr[i].s, sForecast);
 
 				// Messages: appended to forecast
-				if (n5x8 > 0) {
-					if (i5x8 >= n5x8) i5x8 = 0;
-					strcat(arr[i].s, "   ");
-					strcat(arr[i].s, lines5x8[i5x8++]);
-				}
+				//if (n5x8 > 0) {
+				//	if (i5x8 >= n5x8) i5x8 = 0;
+				//	strcat(arr[i].s, "       ");
+				//	strcat(arr[i].s, lines5x8[i5x8++]);
+				//}
 
 			}
 
@@ -716,21 +739,23 @@ void TimeDateWeather () {
 				for (i = 0; arr[i].fonttype != 0; i++);
 				
 				arr[i].s[0] = '\0';
-				arr[i].fonttype = 2;
+				arr[i].s2[0] = '\0';
+				arr[i].fonttype = FONT5X5;
 				arr[i].pos = 1;
-				arr[i].color = GREEN;
 
 				// Date
+				// Sat, May 2, 2020
 				fp = popen("date +'%a, %b %-d, %Y'", "r"); 
 				if (fp != NULL) {
 					fgets(s0, sizeof(s0) - 1, fp);
 					pclose(fp);
 					s0[strlen(s0) - 1] = '\0';
 					strcat(arr[i].s, s0);
-					strcat(arr[i].s, "   ");
+					strcat(arr[i].s, "       ");
 				}
 
 				// Time
+				// 6:18 pm
 				fp = popen("date +'%-I:%M %P'", "r"); 
 				if (fp != NULL) {
 					fgets(s0, sizeof(s0) - 1, fp);
@@ -740,11 +765,11 @@ void TimeDateWeather () {
 				}
 
 				// Messages: appended to date/time
-				if (n5x5 > 0) {
-					if (i5x5 >= n5x5) i5x5 = 0;
-					strcat(arr[i].s, "   ");
-					strcat(arr[i].s, lines5x5[i5x5++]);
-				}
+				//if (n5x5 > 0) {
+				//	if (i5x5 >= n5x5) i5x5 = 0;
+				//	strcat(arr[i].s, "       ");
+				//	strcat(arr[i].s, lines5x5[i5x5++]);
+				//}
 
 			}
 
