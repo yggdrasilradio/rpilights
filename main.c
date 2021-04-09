@@ -20,21 +20,39 @@
 #define FONT5X8 1
 #define FONT5X5 2
 
+#define CIRCLE 1
+#define SQUARE 2
+#define BOTH 3
+
 #define TARGET_FREQ WS2811_TARGET_FREQ
 #define GPIO_PIN0 18
 #define GPIO_PIN1 19
 #define DMA 10
 #define PIDFILE "/var/run/rpilights.pid"
 
-#define HOLIDAYS "/home/pi/rpilights/.holidays"		// Location of holiday definitions file
-#define TEMPERATURE "/dev/shm/.temperature"		// Location of temperature file
-#define FORECAST "/dev/shm/.forecast"			// Location of weather forecast file
-#define MESSAGES5x8 "/home/pi/rpilights/.messages5x8"	// Location of messages for 1st line of display
-#define MESSAGES5x5 "/home/pi/rpilights/.messages5x5"	// Location of messages for 2nd line of display
-#define MAP "/home/pi/rpilights/map.txt"		// Location of LED map file
-#define COMMAND "/home/pi/rpilights/.command"		// Location of previous animation file
+// Location of holiday definitions file
+#define HOLIDAYS "/home/rca/projects/rpilights/.holidays"
 
-#define INT 50						// LED intensity (0 to 255) normally 50
+// Location of temperature file
+#define TEMPERATURE "/dev/shm/.temperature"
+
+// Location of weather forecast file
+#define FORECAST "/dev/shm/.forecast"
+
+// Location of messages for 1st line of display
+#define MESSAGES5x8 "/home/rca/projects/rpilights/.messages5x8"
+
+// Location of messages for 2nd line of display
+#define MESSAGES5x5 "/home/rca/projects/rpilights/.messages5x5"
+
+// Location of LED map file
+#define MAP "/home/rca/projects/rpilights/map.txt"
+
+// Location of previous animation file
+#define COMMAND "/home/rca/projects/rpilights/.command"
+
+// LED intensity (0 to 255) normally 50
+#define INT 8
 
 #define RED RGB(255, 0, 0)
 #define DARKRED RGB(128, 0, 0)
@@ -238,17 +256,17 @@ static const uint8_t font5x8[] = {
 
 uint32_t RGB(uint32_t r, uint32_t g, uint32_t b) {
 
-	return ((r & 0xFF) << 16) | ((g & 0xFF) << 8) | (b & 0xFF);
+	return ((g & 0xFF) << 16) | ((r & 0xFF) << 8) | (b & 0xFF);
 }
 
 uint32_t ExtractR(uint32_t color) {
 
-	return color >> 16 & 0xFF;
+	return color >> 8 & 0xFF;
 }
 
 uint32_t ExtractG(uint32_t color) {
 
-	return color >> 8 & 0xFF;
+	return color >> 16 & 0xFF;
 }
 
 uint32_t ExtractB(uint32_t color) {
@@ -473,21 +491,13 @@ void ScrollString(uint8_t *s, uint32_t color) {
 
 	uint32_t i, j, k, bcolor, y;
 
-	y = floor((height - 10) / 2);
+	y = floor((height - 7) / 2);
 	uint32_t n = strlen(s) - 1;
 	k = width;
 	for (i = 0; i < width + (n * 6) + 5; i++) {
 
 		clearScreen();
-
-		// Scrolling color borders
-		for (j = 0; j < k; j++) {
-			bcolor = Colors((j % k) * (1536 / k));
-			setPixel((j + itime) % width, y, bcolor);
-			setPixel((j + itime) % width, y + 9, bcolor);
-		}
-
-		Draw5x8String(s, width - i, y + 1);
+		Draw5x5String(s, width - i, y + 2);
 		itime++;
 
 		Render();
@@ -603,7 +613,6 @@ void TimeDateWeather () {
 
 	itime = 0;
 	uint32_t bgcolor = BLACK;
-
 
 	s[0] = '\0';
 	s0[0] = '\0';
@@ -800,9 +809,9 @@ void TimeDateWeather () {
 						if (fgets(s, sizeof(s) - 1, fp) == NULL)
 							break;
 						s[strlen(s) - 1] = '\0';
-						DrawShapes(70);
+						DrawShapes(BOTH, 70);
 						ScrollString(s, WHITE);
-						DrawShapes(70);
+						DrawShapes(BOTH, 70);
 						break;
 					}
 				}
@@ -831,7 +840,25 @@ void RainbowLights() {
 	}
 }
 
-void DrawShapes(uint32_t duration) {
+void Fireworks() {
+
+	ws2811_init(&ledstring);
+	DrawShapes(CIRCLE, 0);
+}
+
+void Squares() {
+
+	ws2811_init(&ledstring);
+	DrawShapes(SQUARE, 0);
+}
+
+void Shapes() {
+
+	ws2811_init(&ledstring);
+	DrawShapes(BOTH, 0);
+}
+
+void DrawShapes(uint32_t shapes, uint32_t duration) {
 
 	#define NSHAPES 7
 
@@ -849,7 +876,7 @@ void DrawShapes(uint32_t duration) {
 		arr[i].size = 0;
 
 	clearScreen();
-	for (i = 0; i < duration; i++) {
+	for (i = 0; i < duration || duration == 0; i++) {
 
 		fadeScreen(0.60);
 
@@ -858,6 +885,10 @@ void DrawShapes(uint32_t duration) {
 			for (j = 0; j < NSHAPES; j++) {
 				if (arr[j].size == 0) {
 					arr[j].type = rand() & 1;
+					if (shapes == CIRCLE)
+						arr[j].type = 0;
+					else if (shapes == SQUARE)
+						arr[j].type = 1;
 					arr[j].xcenter = rand() % width;
 					arr[j].ycenter = rand() % height;
 					arr[j].size = 1;
@@ -1621,6 +1652,18 @@ int main(int argc, char *argv[]) {
 		// RPILIGHTS CHRISTMAS
 		if (strcmp(command, "christmas") == 0)
 			StartService(Christmas);
+
+		// RPILIGHTS FIREWORKS
+		if (strcmp(command, "fireworks") == 0)
+			StartService(Fireworks);
+
+		// RPILIGHTS FIREWORKS
+		if (strcmp(command, "squares") == 0)
+			StartService(Squares);
+
+		// RPILIGHTS FIREWORKS
+		if (strcmp(command, "shapes") == 0)
+			StartService(Shapes);
 	}
 
 	// USAGE
@@ -1635,13 +1678,18 @@ int main(int argc, char *argv[]) {
 	printf("\trpilights yellow\tSet all lights to yellow\n");
 	printf("\trpilights cyan\t\tSet all lights to cyan\n");
 	printf("\trpilights rainbow\tDisplay scrolling rainbow pattern\n");
+	printf("\trpilights twinkle\tDisplay twinkle lights animation\n");
 	printf("\trpilights ip\t\tDisplay scrolling IP address\n");
+	printf("\trpilights lines\t\tDisplay random lines animation\n");
+	printf("\trpilights fireworks\t\tDisplay fireworks animation\n");
+	printf("\trpilights squares\t\tDisplay animated squares\n");
+	printf("\trpilights shapes\t\tDisplay animated shapes\n");
+/*
 	printf("\trpilights pacman\tDisplay Pacman animation\n");
 	printf("\trpilights snow\t\tDisplay snow animation\n");
-	printf("\trpilights lines\t\tDisplay random lines animation\n");
-	printf("\trpilights twinkle\tDisplay twinkle lights animation\n");
 	printf("\trpilights valentines\tDisplay Valentine's Day animation\n");
 	printf("\trpilights stpatricks\tDisplay St Patrick\'s Day animation\n");
 	printf("\trpilights christmas\tDisplay Christmas animation\n");
+*/
 	exit(0);
 }
