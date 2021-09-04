@@ -12,36 +12,6 @@ outdated at some point as the vendor likes to play
 Feng Shui with his listings.  Also, be aware that the delivery times might sometimes be very long, like several months,
 so plan ahead!
 
-If the link is outdated (likely), look for these keywords: 
-
-* WS2811
-* 12mm
-* Diffused
-* RGB
-* LED
-* Round
-* IP68
-* DC 5V
-
-Either mount in pegboard (holes every 2 inches drilled out to 12mm) or in 1/2 inch grid hardware cloth.
-
-You will an external 5v power supply to power the lights if there are more than 100 or so.
-I use [this one](https://www.amazon.com/dp/B00EZJFMKU).
-The +5v and GND will need to be
-connected to the power wires around every 200 lights due to internal resistance of the wires and circuitry.  Otherwise you will
-see the intensity of the lights dim noticeably at the far end.
-
-Also, unless you boost the Pi's GPIO 3v signal to 5v, make sure the signal wire is very short, a half foot or a foot at most.
-Otherwise the lights will flash randomly.
-
-See the "Limitations" info in the README for the rpi\_ws281x submodule -- on some Pis, the sound submodule keeps the lights from
-working and needs to be disabled.
-
-It is difficult to figure out which end of the light strand is to receive the signal.  Peer into the lights to see if you can
-make out which side of the internal circuit board has the labels +5V, DIN (or DI), GND vs. +5v, DOUT (or DO), GND.  The waterproof
-resin that fills each bulb is hazy and distorted, so this can be quite a challenge.  Sometimes there is an arrow that points away
-from the wires that are to receive the signal.
-
 ### Software
 
 Install into the directory /home/pi/rpilights:
@@ -106,6 +76,8 @@ For example, a simple 10x10 LED panel might look like this:
 The format of the map.txt file is very fussy; it can't have comments in it, blank lines at the beginning, the spacing has to be exactly like
 the examples, etc.
 
+The map.txt file that is included works for a 8x32 display.
+
 ### rpilights command
 
 The "rpilights" command by itself with no further arguments should give a list of possible commands:
@@ -120,14 +92,13 @@ The "rpilights" command by itself with no further arguments should give a list o
 		rpilights yellow	Set all lights to yellow
 		rpilights cyan		Set all lights to cyan
 		rpilights rainbow	Display scrolling rainbow pattern
-		rpilights ip		Display scrolling IP address
-		rpilights pacman	Display Pacman animation
-		rpilights snow		Display snow animation
-		rpilights lines		Display random lines animation
 		rpilights twinkle	Display twinkle lights animation
-		rpilights valentines	Display Valentine's Day animation
-		rpilights stpatricks	Display St Patrick's Day animation
-		rpilights christmas	Display Christmas animation
+		rpilights ip		Display scrolling IP address
+		rpilights lines		Display random lines animation
+		rpilights fireworks	Display fireworks animation
+		rpilights squares	Display animated squares
+		rpilights shapes	Display animated shapes
+		rpilights pacman	Display Pacman animation
 
 ### rc.local
 

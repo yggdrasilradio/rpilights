@@ -8,6 +8,8 @@ set result = `jq -r '.cod' < .wxdata`
 if ($result == 200) then
 	set result = `jq -r '.main.temp' < .wxdata`
 	/usr/bin/printf '%.0f\n' $result > .temperature
+	set result = `jq -r '.main.humidity' < .wxdata`
+	/usr/bin/printf '%.0f\n' $result > .humidity
 	set result = `jq -r '.weather | map (.main) | join (", ")' < .wxdata`
 	echo $result > .forecast
 endif

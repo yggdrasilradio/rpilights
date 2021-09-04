@@ -28,10 +28,11 @@
 #define GPIO_PIN0 18
 #define GPIO_PIN1 19
 #define DMA 10
+
 #define PIDFILE "/var/run/rpilights.pid"
 
 // Location of holiday definitions file
-#define HOLIDAYS "/home/rca/projects/rpilights/.holidays"
+#define HOLIDAYS "/home/pi/rpilights/.holidays"
 
 // Location of temperature file
 #define TEMPERATURE "/dev/shm/.temperature"
@@ -40,16 +41,16 @@
 #define FORECAST "/dev/shm/.forecast"
 
 // Location of messages for 1st line of display
-#define MESSAGES5x8 "/home/rca/projects/rpilights/.messages5x8"
+#define MESSAGES5x8 "/home/pi/rpilights/.messages5x8"
 
 // Location of messages for 2nd line of display
-#define MESSAGES5x5 "/home/rca/projects/rpilights/.messages5x5"
+#define MESSAGES5x5 "/home/pi/rpilights/.messages5x5"
 
 // Location of LED map file
-#define MAP "/home/rca/projects/rpilights/map.txt"
+#define MAP "/home/pi/rpilights/map.txt"
 
 // Location of previous animation file
-#define COMMAND "/home/rca/projects/rpilights/.command"
+#define COMMAND "/home/pi/rpilights/.command"
 
 // LED intensity (0 to 255) normally 50
 #define INT 8
@@ -96,7 +97,7 @@ ws2811_t ledstring = {
             .gpionum = 0,
             .count = 0,
             .invert = 0,
-            .brightness = 0
+            .brightness = 0,
         },
     },
 };
@@ -655,7 +656,7 @@ void TimeDateWeather () {
 	}
 
 	y5x8 = floor((height - 13) / 2);
-	y5x5 = y5x8 + 8;
+	y5x5 = y5x8 + 9;
 
 	ws2811_init(&ledstring);
 
@@ -683,9 +684,9 @@ void TimeDateWeather () {
 			// Need to generate new 5x8 string?
 			count = 0;
 			for (i = width / 2; i < width; i++)
-				for (j = 1; j < 9; j++)
-					if (getPixel(i, j) != bgcolor)
-						count++;
+				for (j = 1; j < 8; j++)
+				       	if (getPixel(i, j) != bgcolor)
+					       	count++;
 			if (count == 0) {
 
 				// Generate new 5x8 string
@@ -739,7 +740,7 @@ void TimeDateWeather () {
 			// Need to generate new 5x5 string?
 			count = 0;
 			for (i = width / 2; i < width; i++)
-				for (j = 9; j < 15; j++)
+				for (j = 8; j < 16; j++)
 					if (getPixel(i, j) != bgcolor)
 						count++;
 			if (count == 0) {
@@ -760,7 +761,7 @@ void TimeDateWeather () {
 					pclose(fp);
 					s0[strlen(s0) - 1] = '\0';
 					strcat(arr[i].s, s0);
-					strcat(arr[i].s, "       ");
+					strcat(arr[i].s, "    ");
 				}
 
 				// Time
@@ -1403,14 +1404,14 @@ void StPatricksDay() {
 	int32_t x, y, xwidth, yheight;
 
 	ws2811_init(&ledstring);
-	GetGIFDimensions("/home/pi/rpilights/images/stpatricksday.gif.rgb", &xwidth, &yheight);
-	RenderFile("/home/pi/rpilights/images/stpatricksday.gif.rgb");
+	GetGIFDimensions("/home/pi/rpilights/images/stpatricks.gif.rgb", &xwidth, &yheight);
+	RenderFile("/home/pi/rpilights/images/stpatricks.gif.rgb");
 	Render();
 	x = width;
 	while (TRUE) {
 		Delay();
 		scrollLeft();
-		RenderSlice("/home/pi/rpilights/images/stpatricksday.gif.rgb", x, slice);
+		RenderSlice("/home/pi/rpilights/images/stpatricks.gif.rgb", x, slice);
 		for (y = 0; y < height; y++)
 			setPixel(width - 1, y, slice[y]);
 		x = ++x % xwidth;
@@ -1681,15 +1682,13 @@ int main(int argc, char *argv[]) {
 	printf("\trpilights twinkle\tDisplay twinkle lights animation\n");
 	printf("\trpilights ip\t\tDisplay scrolling IP address\n");
 	printf("\trpilights lines\t\tDisplay random lines animation\n");
-	printf("\trpilights fireworks\t\tDisplay fireworks animation\n");
-	printf("\trpilights squares\t\tDisplay animated squares\n");
-	printf("\trpilights shapes\t\tDisplay animated shapes\n");
-/*
+	printf("\trpilights fireworks\tDisplay fireworks animation\n");
+	printf("\trpilights squares\tDisplay animated squares\n");
+	printf("\trpilights shapes\tDisplay animated shapes\n");
+	printf("\trpilights snow\tDisplay animated snow\n");
 	printf("\trpilights pacman\tDisplay Pacman animation\n");
-	printf("\trpilights snow\t\tDisplay snow animation\n");
 	printf("\trpilights valentines\tDisplay Valentine's Day animation\n");
-	printf("\trpilights stpatricks\tDisplay St Patrick\'s Day animation\n");
-	printf("\trpilights christmas\tDisplay Christmas animation\n");
-*/
+	printf("\trpilights stpatricks\tDisplay St Patrick's Day animation\n");
+
 	exit(0);
 }
