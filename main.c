@@ -394,9 +394,9 @@ void Draw5x5String(uint8_t *p, uint32_t x, uint32_t y) {
 	uint32_t color = GREEN;
 
 	while (*p != '\0') {
-		if (i++ > 30)
+		if (*p == '\f')
 			color = YELLOW;
-		if (*p == ',') // give comma a descender
+		else if (*p == ',') // give comma a descender
 			x += (Draw5x5Char(*p, x, y + 1, color) + 1);
 		else
 			x += (Draw5x5Char(*p, x, y, color) + 1);
@@ -448,9 +448,10 @@ void Draw5x8String(uint8_t *p, uint32_t x, uint32_t y) {
 	uint32_t color = WHITE;
 
 	while (*p != '\0') {
-		//if (i++ > 30)
-		//	color = CYAN;
-		x += (Draw5x8Char(*p, x, y, color) + 1);
+		if (*p == '\f')
+			color = CYAN;
+		else
+			x += (Draw5x8Char(*p, x, y, color) + 1);
 		*p++;
 	}
 }
@@ -729,11 +730,11 @@ void TimeDateWeather () {
 				strcat(arr[i].s, sForecast);
 
 				// Messages: appended to forecast
-				//if (n5x8 > 0) {
-				//	if (i5x8 >= n5x8) i5x8 = 0;
-				//	strcat(arr[i].s, "       ");
-				//	strcat(arr[i].s, lines5x8[i5x8++]);
-				//}
+				if (n5x8 > 0) {
+					if (i5x8 >= n5x8) i5x8 = 0;
+					strcat(arr[i].s, "\f   ");
+					strcat(arr[i].s, lines5x8[i5x8++]);
+				}
 
 			}
 
@@ -775,11 +776,11 @@ void TimeDateWeather () {
 				}
 
 				// Messages: appended to date/time
-				//if (n5x5 > 0) {
-				//	if (i5x5 >= n5x5) i5x5 = 0;
-				//	strcat(arr[i].s, "       ");
-				//	strcat(arr[i].s, lines5x5[i5x5++]);
-				//}
+				if (n5x5 > 0) {
+					if (i5x5 >= n5x5) i5x5 = 0;
+					strcat(arr[i].s, "\f   ");
+					strcat(arr[i].s, lines5x5[i5x5++]);
+				}
 
 			}
 
