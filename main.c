@@ -530,9 +530,18 @@ void ScrollString(uint8_t *s, uint32_t color) {
 	y = floor((height - 7) / 2);
 	uint32_t n = strlen(s) - 1;
 	k = width;
+
 	for (i = 0; i < width + (n * 6) + 5; i++) {
 
 		clearScreen();
+
+		// Scrolling color borders
+		for (j = 0; j < k; j++) {
+			bcolor = Colors((j % k) * (1536 / k));
+			setPixel((j + itime) % width, 0, bcolor);
+			setPixel((j + itime) % width, height - 1, bcolor);
+		}
+
 		Draw5x8String(s, width - i, y);
 		itime++;
 
