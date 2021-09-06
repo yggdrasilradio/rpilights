@@ -260,6 +260,36 @@ uint32_t RGB(uint32_t r, uint32_t g, uint32_t b) {
 	return ((g & 0xFF) << 16) | ((r & 0xFF) << 8) | (b & 0xFF);
 }
 
+uint32_t SetColor(uint8_t c) {
+
+	switch (c) {
+		case 'R':
+			return RED;
+			break;
+		case 'G':
+			return GREEN;
+			break;
+		case 'B':
+			return BLUE;
+			break;
+		case 'C':
+			return CYAN;
+			break;
+		case 'M':
+			return MAGENTA;
+			break;
+		case 'Y':
+			return YELLOW;
+			break;
+		case 'W':
+			return WHITE;
+			break;
+		default:
+			return BLACK;
+			break;
+	}
+}
+
 uint32_t ExtractR(uint32_t color) {
 
 	return color >> 8 & 0xFF;
@@ -394,8 +424,8 @@ void Draw5x5String(uint8_t *p, uint32_t x, uint32_t y) {
 	uint32_t color = GREEN;
 
 	while (*p != '\0') {
-		if (*p == '\f')
-			color = YELLOW;
+		if (*p < ' ')
+			color = SetColor(*++p);
 		else if (*p == ',') // give comma a descender
 			x += (Draw5x5Char(*p, x, y + 1, color) + 1);
 		else
@@ -448,8 +478,8 @@ void Draw5x8String(uint8_t *p, uint32_t x, uint32_t y) {
 	uint32_t color = WHITE;
 
 	while (*p != '\0') {
-		if (*p == '\f')
-			color = CYAN;
+		if (*p < ' ')
+			color = SetColor(*++p);
 		else
 			x += (Draw5x8Char(*p, x, y, color) + 1);
 		*p++;
@@ -732,7 +762,7 @@ void TimeDateWeather () {
 				// Messages: appended to forecast
 				if (n5x8 > 0) {
 					if (i5x8 >= n5x8) i5x8 = 0;
-					strcat(arr[i].s, "\f   ");
+					strcat(arr[i].s, "C   ");
 					strcat(arr[i].s, lines5x8[i5x8++]);
 				}
 
@@ -778,7 +808,7 @@ void TimeDateWeather () {
 				// Messages: appended to date/time
 				if (n5x5 > 0) {
 					if (i5x5 >= n5x5) i5x5 = 0;
-					strcat(arr[i].s, "\f   ");
+					strcat(arr[i].s, "Y   ");
 					strcat(arr[i].s, lines5x5[i5x5++]);
 				}
 
