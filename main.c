@@ -533,7 +533,7 @@ void ScrollString(uint8_t *s, uint32_t color) {
 	for (i = 0; i < width + (n * 6) + 5; i++) {
 
 		clearScreen();
-		Draw5x5String(s, width - i, y + 2);
+		Draw5x8String(s, width - i, y);
 		itime++;
 
 		Render();
