@@ -542,7 +542,7 @@ void ScrollString(uint8_t *s, uint32_t color) {
 			setPixel((j + itime) % width, height - 1, bcolor);
 		}
 
-		Draw5x8String(s, width - i, y);
+		Draw5x8String(s, width - i, y + 1);
 		itime++;
 
 		Render();

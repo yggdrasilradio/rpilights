@@ -3,14 +3,12 @@ rpilights
 
 ![](misc/title.jpg)
 
-Software for LED window display such as the one in [this video](https://www.youtube.com/watch?v=n9-j6oeJJw4).
+Software for a 16x32 LED display such as the one in [this video](https://www.youtube.com/watch?v=XgLVOO9Eu0).
 
 ### Hardware
 
-Lights [here](https://www.amazon.com/Diffused-Digital.../dp/B00B4UKG2W).  This link may be
-outdated at some point as the vendor likes to play
-Feng Shui with his listings.  Also, be aware that the delivery times might sometimes be very long, like several months,
-so plan ahead!
+Two of [these displays](https://www.amazon.com/gp/product/B01DC0IPVU),
+chained together.
 
 ### Software
 
@@ -22,8 +20,7 @@ Install into the directory /home/pi/rpilights:
 	cd /home/pi
 	git clone --recursive git://github.com/yggdrasilradio/rpilights.git
 
-The command "make" should build the "rpilights" command, but it won't work properly until you configure the map.txt file
-to reflect the physical layout of your LED display.
+The command "make" should build the "rpilights" command.
 
 The "snow" animation vertically scrolls the graphic data in the file images/snow.gif.rgb.
 
@@ -38,13 +35,13 @@ of ImageMagick) via the commands:
 	gif2rgb valentines.gif
 	gif2rgb stpatricksday.gif
 
-Make your own files with the dimensions of your display, as the existing data probably doesn't match those dimensions.
+Make your own files with the dimensions of your display if it differs from 16x32.
 
 ### map.txt file
 
 The "map.txt" file describes the physical layout of your LED lights as an ASCII picture, viewed from the back of the display.
-The existing map.txt file is for a complicated two-channel multi-panel display that I have in my four basement windows right
-now.  Please edit it to reflect the arrangement of your lights:
+The existing map.txt file is for the 16x32 display described above.
+Please edit it to reflect the arrangement of your lights, if they differ:
 
 	o		LED lights
 	| and --	wires
@@ -76,7 +73,7 @@ For example, a simple 10x10 LED panel might look like this:
 The format of the map.txt file is very fussy; it can't have comments in it, blank lines at the beginning, the spacing has to be exactly like
 the examples, etc.
 
-The map.txt file that is included works for a 8x32 display.
+The map.txt file that is included works for a 16x32 display.
 
 ### rpilights command
 
