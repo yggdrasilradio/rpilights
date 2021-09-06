@@ -255,6 +255,10 @@ static const uint8_t font5x8[] = {
 	0x00, 0x00, 0x00, 0x00, 0x00  // DEL (unused)
 };
 
+uint8_t n5x8, n5x5, i5x8, i5x5;
+char lines5x8[20][128];
+char lines5x5[20][128];
+
 uint32_t RGB(uint32_t r, uint32_t g, uint32_t b) {
 
 	return ((g & 0xFF) << 16) | ((r & 0xFF) << 8) | (b & 0xFF);
@@ -285,7 +289,7 @@ uint32_t SetColor(uint8_t c) {
 			return WHITE;
 			break;
 		default:
-			return BLACK;
+			return WHITE;
 			break;
 	}
 }
@@ -624,9 +628,44 @@ void scrollDown() {
 		setPixel(i, 0, arr[i]);
 }
 
+void Read5x8Text () {
+
+	FILE *fp;
+
+	// Read messages for 5x8 text
+	i5x8 = 0;
+	n5x8 = 0;
+	fp = fopen(MESSAGES5x8, "r");
+	if (fp != NULL) {
+		while(fgets(lines5x8[n5x8], 128, fp)) {
+			lines5x8[n5x8][strlen(lines5x8[n5x8]) - 1] = '\0';
+			n5x8++;
+		}
+		fclose(fp);
+	}
+
+}
+
+void Read5x5Text () {
+
+	FILE *fp;
+
+	// Read messages for 5x5 text
+	i5x5 = 0;
+	n5x5 = 0;
+	fp = fopen(MESSAGES5x5, "r");
+	if (fp != NULL) {
+		while(fgets(lines5x5[n5x5], 128, fp)) {
+			lines5x5[n5x5][strlen(lines5x5[n5x5]) - 1] = '\0';
+			n5x5++;
+		}
+		fclose(fp);
+	}
+}
+
 void TimeDateWeather () {
 
-	uint32_t i0 = 0, i1 = 0, count;
+	uint32_t count;
 	int32_t idur, i, j, y5x8, y5x5;
 	FILE *fp;
 	uint8_t s0[500], s1[500], s2[500];
@@ -639,9 +678,6 @@ void TimeDateWeather () {
 		uint8_t s2[300];
 	} arr[10];
 	uint8_t temp[10];
-	uint8_t n5x8, n5x5, i5x8, i5x5;
-	char lines5x8[20][128];
-	char lines5x5[20][128];
 
 	itime = 0;
 	uint32_t bgcolor = BLACK;
@@ -653,30 +689,12 @@ void TimeDateWeather () {
 	sTemperature[0] = '\0';
 	sForecast[0] = '\0';
 
-	i5x8 = 0;
-	i5x5 = 0;
 
 	// Read messages for 5x8 text
-	n5x8 = 0;
-	fp = fopen(MESSAGES5x8, "r");
-	if (fp != NULL) {
-		while(fgets(lines5x8[n5x8], 128, fp)) {
-			lines5x8[n5x8][strlen(lines5x8[n5x8]) - 1] = '\0';
-			n5x8++;
-		}
-		fclose(fp);
-	}
+	Read5x8Text();
 
 	// Read messages for 5x5 text
-	n5x5 = 0;
-	fp = fopen(MESSAGES5x5, "r");
-	if (fp != NULL) {
-		while(fgets(lines5x5[n5x5], 128, fp)) {
-			lines5x5[n5x5][strlen(lines5x5[n5x5]) - 1] = '\0';
-			n5x5++;
-		}
-		fclose(fp);
-	}
+	Read5x5Text();
 
 	// Clear text render queue
 	for (i = 0; i < (sizeof(arr) / sizeof(arr[0])); i++) {
@@ -761,7 +779,8 @@ void TimeDateWeather () {
 
 				// Messages: appended to forecast
 				if (n5x8 > 0) {
-					if (i5x8 >= n5x8) i5x8 = 0;
+					if (i5x8 >= n5x8)
+						Read5x8Text();
 					strcat(arr[i].s, "C   ");
 					strcat(arr[i].s, lines5x8[i5x8++]);
 				}
@@ -807,7 +826,8 @@ void TimeDateWeather () {
 
 				// Messages: appended to date/time
 				if (n5x5 > 0) {
-					if (i5x5 >= n5x5) i5x5 = 0;
+					if (i5x5 >= n5x5)
+						Read5x5Text();
 					strcat(arr[i].s, "Y   ");
 					strcat(arr[i].s, lines5x5[i5x5++]);
 				}
