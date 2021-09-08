@@ -3,7 +3,7 @@ rpilights
 
 ![](misc/title.jpg)
 
-Software for a 16x32 LED display such as the one in [this video](https://www.youtube.com/watch?v=XgLVOO9Eu0).
+Software for a 16x32 LED display such as the one shown above, and in [this video](https://www.youtube.com/watch?v=XgLVOO9Eu0).
 
 ### Hardware
 
@@ -79,6 +79,7 @@ The map.txt file that is included works for a 16x32 display.
 
 The "rpilights" command by itself with no further arguments should give a list of possible commands:
 
+
 	Usage:	rpilights on		Turn lights on (show last animation)
 		rpilights off		Turn lights off
 		rpilights weather	Display scrolling time, date, weather
@@ -95,7 +96,10 @@ The "rpilights" command by itself with no further arguments should give a list o
 		rpilights fireworks	Display fireworks animation
 		rpilights squares	Display animated squares
 		rpilights shapes	Display animated shapes
+		rpilights snow	Display animated snow
 		rpilights pacman	Display Pacman animation
+		rpilights valentines	Display Valentine's Day animation
+		rpilights stpatricks	Display St Patrick's Day animation
 
 ### rc.local
 
@@ -106,6 +110,17 @@ The file misc/rc.local has suggested commands to add to your existing /etc/rc.lo
 If these files exist, messages from .messages5x8 will scroll as well as the temperature and weather in the upper line
 of the weather display, and messages from .messages5x5 will scroll along with the date and time in the lower line.  If
 there are multiple lines in the file each line will display in turn.
+
+The default color for the 5x8 messages will be cyan, and the default color for the 5x5 messages will be yellow. but you can embed
+escape sequences in these files to change the color of the fonts:
+
+	ESC R	Red
+	ESC G	Green
+	ESC B	Blue
+	ESC C	Cyan
+	ESC M	Magenta
+	ESC Y	Yellow
+	ESC W	White
 
 ### updatewx script
 
