@@ -96,7 +96,7 @@ The "rpilights" command by itself with no further arguments should give a list o
 		rpilights fireworks	Display fireworks animation
 		rpilights squares	Display animated squares
 		rpilights shapes	Display animated shapes
-		rpilights snow	Display animated snow
+		rpilights snow		Display animated snow
 		rpilights pacman	Display Pacman animation
 		rpilights valentines	Display Valentine's Day animation
 		rpilights stpatricks	Display St Patrick's Day animation

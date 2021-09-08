@@ -1745,7 +1745,7 @@ int main(int argc, char *argv[]) {
 	printf("\trpilights fireworks\tDisplay fireworks animation\n");
 	printf("\trpilights squares\tDisplay animated squares\n");
 	printf("\trpilights shapes\tDisplay animated shapes\n");
-	printf("\trpilights snow\tDisplay animated snow\n");
+	printf("\trpilights snow\t\tDisplay animated snow\n");
 	printf("\trpilights pacman\tDisplay Pacman animation\n");
 	printf("\trpilights valentines\tDisplay Valentine's Day animation\n");
 	printf("\trpilights stpatricks\tDisplay St Patrick's Day animation\n");
