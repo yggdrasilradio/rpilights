@@ -1,4 +1,4 @@
-rpilights
+rpilights 16x32
 ==========
 
 ![](misc/title.jpg)
@@ -9,6 +9,8 @@ Software for a 16x32 LED display such as the one shown above, and in [this video
 
 Two of [these displays](https://www.amazon.com/gp/product/B01DC0IPVU),
 chained together.
+
+Connect GND, 5V and DIN on the display to Ground, 5V power and GPIO18, respectively, on the Raspberry Pi.
 
 ### Software
 
@@ -46,7 +48,7 @@ Please edit it to reflect the arrangement of your lights, if they differ:
 	o		LED lights
 	| and --	wires
 	0 and 1		The first LED light on channels 0 (pin 18) and 1 (pin 19)
-	.		(dot) Unused light position (gaps between windows)
+	.		(dot) Unused light position (gaps between panels)
 
 For example, a simple 10x10 LED panel might look like this:
 
