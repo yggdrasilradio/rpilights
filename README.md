@@ -124,6 +124,6 @@ escape sequences in these files to change the color of the fonts:
 
 ### updatewx script
 
-Edit the file scripts/updatewx to put your zipcode in place of mine (55337).
+Edit the file scripts/updatewx to put your zipcode in place of mine (55118).
 This script gets weather info (forecast and temperature) every five minutes.
 You'll want to start this script from rc.local.  If you don't run this, the 'weather' command won't work.
