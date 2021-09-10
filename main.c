@@ -288,6 +288,12 @@ uint32_t SetColor(uint8_t c) {
 		case 'W':
 			return WHITE;
 			break;
+		case 'O':
+			return ORANGE;
+			break;
+		case 'P':
+			return PURPLE;
+			break;
 		default:
 			return WHITE;
 			break;

@@ -124,6 +124,8 @@ escape sequences in these files to change the color of the fonts:
 	ESC C	Cyan
 	ESC M	Magenta
 	ESC Y	Yellow
+	ESC O	Orange
+	ESC P	Purple
 	ESC W	White
 
 ### updatewx script
