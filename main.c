@@ -643,7 +643,7 @@ void scrollDown() {
 		setPixel(i, 0, arr[i]);
 }
 
-void Read5x8Text () {
+void Read5x8Text() {
 
 	FILE *fp;
 
@@ -661,7 +661,7 @@ void Read5x8Text () {
 
 }
 
-void Read5x5Text () {
+void Read5x5Text() {
 
 	FILE *fp;
 
@@ -678,7 +678,128 @@ void Read5x5Text () {
 	}
 }
 
-void TimeDateWeather () {
+void Text() {
+
+	uint32_t count;
+	int32_t idur, i, j, y5x8, y5x5;
+	FILE *fp;
+	uint8_t s0[500], s1[500], s2[500];
+	uint8_t s[500], *p;
+	struct {
+		uint32_t fonttype;
+		uint32_t pos;
+		uint8_t s[300];
+		uint8_t s2[300];
+	} arr[10];
+	uint8_t temp[10];
+
+	itime = 0;
+	uint32_t bgcolor = BLACK;
+
+	s[0] = '\0';
+	s0[0] = '\0';
+	s1[0] = '\0';
+	s2[0] = '\0';
+
+	// Read messages for 5x8 text
+	Read5x8Text();
+
+	// Read messages for 5x5 text
+	Read5x5Text();
+
+	// Clear text render queue
+	for (i = 0; i < (sizeof(arr) / sizeof(arr[0])); i++) {
+		arr[i].fonttype = 0;
+		arr[i].pos = 0;
+		arr[i].s[0] = '\0';
+		arr[i].s2[0] = '\0';
+	}
+
+	y5x8 = floor((height - 13) / 2);
+	y5x5 = y5x8 + 9;
+
+	ws2811_init(&ledstring);
+
+	while(TRUE) {
+
+		for (idur = 0; idur < 390; idur++) {
+
+			// Clear screen
+			setScreen(bgcolor);
+
+			// Render strings
+			for (i = 0; i < (sizeof(arr) / sizeof(arr[0])); i++) {
+
+				// Render 5x8 strings
+				if (arr[i].fonttype == FONT5X8) 
+					if (Do5x8String(arr[i].s, &arr[i].pos, y5x8))
+						arr[i].fonttype = 0;
+
+				// Render 5x5 strings
+				if (arr[i].fonttype == FONT5X5) 
+					if (Do5x5String(arr[i].s, &arr[i].pos, y5x5))
+						arr[i].fonttype = 0;
+			}
+
+			// Need to generate new 5x8 string?
+			count = 0;
+			for (i = width / 2; i < width; i++)
+				for (j = 1; j < 8; j++)
+				       	if (getPixel(i, j) != bgcolor)
+					       	count++;
+			if (count == 0) {
+
+				// Generate new 5x8 string
+				for (i = 0; arr[i].fonttype != 0; i++);
+				
+				arr[i].s[0] = '\0';
+				arr[i].s2[0] = '\0';
+				arr[i].fonttype = FONT5X8;
+				arr[i].pos =  10;
+
+				// Messages for top line
+				if (n5x8 > 0) {
+					if (i5x8 >= n5x8)
+						Read5x8Text();
+					strcat(arr[i].s, "C   ");
+					strcat(arr[i].s, lines5x8[i5x8++]);
+				}
+
+			}
+
+			// Need to generate new 5x5 string?
+			count = 0;
+			for (i = width / 2; i < width; i++)
+				for (j = 8; j < 16; j++)
+					if (getPixel(i, j) != bgcolor)
+						count++;
+			if (count == 0) {
+
+				// Generate new 5x5 string
+				for (i = 0; arr[i].fonttype != 0; i++);
+				
+				arr[i].s[0] = '\0';
+				arr[i].s2[0] = '\0';
+				arr[i].fonttype = FONT5X5;
+				arr[i].pos = 10;
+
+				// Messages
+				if (n5x5 > 0) {
+					if (i5x5 >= n5x5)
+						Read5x5Text();
+					strcat(arr[i].s, "Y   ");
+					strcat(arr[i].s, lines5x5[i5x5++]);
+				}
+
+			}
+
+			Render();
+			Delay();
+		}
+	}
+}
+
+void TimeDateWeather() {
 
 	uint32_t count;
 	int32_t idur, i, j, y5x8, y5x5;
@@ -839,7 +960,7 @@ void TimeDateWeather () {
 					strcat(arr[i].s, s0);
 				}
 
-				// Messages: appended to date/time
+				// Messages for bottom line
 				if (n5x5 > 0) {
 					if (i5x5 >= n5x5)
 						Read5x5Text();
@@ -1731,6 +1852,10 @@ int main(int argc, char *argv[]) {
 		// RPILIGHTS FIREWORKS
 		if (strcmp(command, "shapes") == 0)
 			StartService(Shapes);
+
+		// RPILIGHTS TEXT
+		if (strcmp(command, "text") == 0)
+			StartService(Text);
 	}
 
 	// USAGE
@@ -1755,6 +1880,7 @@ int main(int argc, char *argv[]) {
 	printf("\trpilights pacman\tDisplay Pacman animation\n");
 	printf("\trpilights valentines\tDisplay Valentine's Day animation\n");
 	printf("\trpilights stpatricks\tDisplay St Patrick's Day animation\n");
+	printf("\trpilights text\t\tDisplay text messages\n");
 
 	exit(0);
 }
