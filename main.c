@@ -258,10 +258,28 @@ static const uint8_t font5x8[] = {
 uint8_t n5x8, n5x5, i5x8, i5x5;
 char lines5x8[20][128];
 char lines5x5[20][128];
+uint32_t rcolor;
 
 uint32_t RGB(uint32_t r, uint32_t g, uint32_t b) {
 
 	return ((g & 0xFF) << 16) | ((r & 0xFF) << 8) | (b & 0xFF);
+}
+
+// angle : 0 - 1536
+uint32_t Colors(uint32_t angle) {
+
+	uint32_t t = angle & 255;
+	uint32_t r, g, b;
+
+	switch ((angle >> 8) % 6) {
+		case 0: r = 255; g = t; b = 0; break;
+		case 1: r = 255 - t; g = 255; b = 0; break;
+		case 2: r = 0; g = 255; b = t; break;
+		case 3: r = 0; g = 255 - t; b = 255; break;
+		case 4: r = t; g = 0; b = 255; break;
+		case 5: r = 255; g = 0; b = 255 - t; break;
+	}
+	return RGB(r, g, b);
 }
 
 uint32_t SetColor(uint8_t c) {
@@ -293,6 +311,9 @@ uint32_t SetColor(uint8_t c) {
 			break;
 		case 'P':
 			return PURPLE;
+			break;
+		case '?':
+			return rcolor;
 			break;
 		default:
 			return WHITE;
@@ -440,7 +461,7 @@ void Draw5x5String(uint8_t *p, uint32_t x, uint32_t y) {
 			x += (Draw5x5Char(*p, x, y + 1, color) + 1);
 		else
 			x += (Draw5x5Char(*p, x, y, color) + 1);
-		*p++;
+		p++;
 	}
 }
 
@@ -492,7 +513,7 @@ void Draw5x8String(uint8_t *p, uint32_t x, uint32_t y) {
 			color = SetColor(*++p);
 		else
 			x += (Draw5x8Char(*p, x, y, color) + 1);
-		*p++;
+		p++;
 	}
 }
 
@@ -508,23 +529,6 @@ WriteCommand() {
 	FILE *fp = fopen(COMMAND, "w");
 	fprintf(fp, "%s\n", command);
 	fclose(fp);
-}
-
-// angle : 0 - 1536
-uint32_t Colors(uint32_t angle) {
-
-	uint32_t t = angle & 255;
-	uint32_t r, g, b;
-
-	switch ((angle >> 8) % 6) {
-		case 0: r = 255; g = t; b = 0; break;
-		case 1: r = 255 - t; g = 255; b = 0; break;
-		case 2: r = 0; g = 255; b = t; break;
-		case 3: r = 0; g = 255 - t; b = 255; break;
-		case 4: r = t; g = 0; b = 255; break;
-		case 5: r = 255; g = 0; b = 255 - t; break;
-	}
-	return RGB(r, g, b);
 }
 
 static uint32_t itime = 0;
@@ -683,13 +687,12 @@ void Text() {
 	uint32_t count;
 	int32_t idur, i, j, y5x8, y5x5;
 	FILE *fp;
-	uint8_t s0[500], s1[500], s2[500];
 	uint8_t s[500], *p;
 	struct {
 		uint32_t fonttype;
 		uint32_t pos;
+		uint32_t rcolor;
 		uint8_t s[300];
-		uint8_t s2[300];
 	} arr[10];
 	uint8_t temp[10];
 
@@ -697,9 +700,6 @@ void Text() {
 	uint32_t bgcolor = BLACK;
 
 	s[0] = '\0';
-	s0[0] = '\0';
-	s1[0] = '\0';
-	s2[0] = '\0';
 
 	// Read messages for 5x8 text
 	Read5x8Text();
@@ -712,7 +712,6 @@ void Text() {
 		arr[i].fonttype = 0;
 		arr[i].pos = 0;
 		arr[i].s[0] = '\0';
-		arr[i].s2[0] = '\0';
 	}
 
 	y5x8 = floor((height - 13) / 2);
@@ -729,6 +728,9 @@ void Text() {
 
 			// Render strings
 			for (i = 0; i < (sizeof(arr) / sizeof(arr[0])); i++) {
+
+				// Set random color
+				rcolor = arr[i].rcolor;
 
 				// Render 5x8 strings
 				if (arr[i].fonttype == FONT5X8) 
@@ -753,9 +755,9 @@ void Text() {
 				for (i = 0; arr[i].fonttype != 0; i++);
 				
 				arr[i].s[0] = '\0';
-				arr[i].s2[0] = '\0';
 				arr[i].fonttype = FONT5X8;
-				arr[i].pos =  10;
+				arr[i].pos = 10;
+				arr[i].rcolor = Colors(rand() % 1536);
 
 				// Messages for top line
 				if (n5x8 > 0) {
@@ -779,9 +781,9 @@ void Text() {
 				for (i = 0; arr[i].fonttype != 0; i++);
 				
 				arr[i].s[0] = '\0';
-				arr[i].s2[0] = '\0';
 				arr[i].fonttype = FONT5X5;
 				arr[i].pos = 10;
+				arr[i].rcolor = Colors(rand() % 1536);
 
 				// Messages
 				if (n5x5 > 0) {
@@ -810,6 +812,7 @@ void TimeDateWeather() {
 	struct {
 		uint32_t fonttype;
 		uint32_t pos;
+		uint32_t rcolor;
 		uint8_t s[300];
 		uint8_t s2[300];
 	} arr[10];
@@ -855,6 +858,9 @@ void TimeDateWeather() {
 			// Render strings
 			for (i = 0; i < (sizeof(arr) / sizeof(arr[0])); i++) {
 
+				// Set random color
+				rcolor = arr[i].rcolor;
+
 				// Render 5x8 strings
 				if (arr[i].fonttype == FONT5X8) 
 					if (Do5x8String(arr[i].s, &arr[i].pos, y5x8))
@@ -881,6 +887,7 @@ void TimeDateWeather() {
 				arr[i].s2[0] = '\0';
 				arr[i].fonttype = FONT5X8;
 				arr[i].pos = 1;
+				arr[i].rcolor = Colors(rand() % 1536);
 
 				// Temperature
 				s[0]= '\0';
@@ -938,6 +945,7 @@ void TimeDateWeather() {
 				arr[i].s2[0] = '\0';
 				arr[i].fonttype = FONT5X5;
 				arr[i].pos = 1;
+				arr[i].rcolor = Colors(rand() % 1536);
 
 				// Date
 				// Sat, May 2, 2020
