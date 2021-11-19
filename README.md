@@ -5,7 +5,7 @@ rpilights 16x32
 
 Software for a Raspberry Pi and a 16x32 LED
 display such as the one shown above,
-and in [this video](https://www.youtube.com/watch?v=XgLVOO9Eu0).
+and in [this video](https://www.youtube.com/watch?v=XgLV00P9Eu0).
 
 ### Hardware
 
