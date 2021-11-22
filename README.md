@@ -38,6 +38,11 @@ of ImageMagick) via the commands:
 	gif2rgb snow.gif
 	gif2rgb valentines.gif
 	gif2rgb stpatricksday.gif
+	gif2rgb christmas.gif
+	gif2rgb pacman1.gif
+	gif2rgb pacman2.gif
+	gif2rgb pacman3.gif
+	gif2rgb pacman4.gif
 
 Make your own files with the dimensions of your display if it differs from 16x32.
 
